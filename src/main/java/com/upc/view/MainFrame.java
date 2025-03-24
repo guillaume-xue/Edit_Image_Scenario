@@ -11,18 +11,20 @@ public class MainFrame extends JFrame {
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
 
-    public MainFrame() {
+    public MainFrame(ImageEditPanel imageEditPanel) {
+        this.imageEditPanel = imageEditPanel;
         init();
         // Configurer le menu pour Mac
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        // System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         createMenuBar();
         viewPanel = new ViewPanel();
         timeLinePanel = new TimeLinePanel();
-        imageEditPanel = new ImageEditPanel();
+
+        this.setLayout(new BorderLayout());
         this.add(viewPanel, BorderLayout.EAST);
         this.add(timeLinePanel, BorderLayout.SOUTH);
-        this.add(imageEditPanel, BorderLayout.WEST);
+        this.add(imageEditPanel.getPanel(), BorderLayout.WEST);
     }
 
     private void init() {

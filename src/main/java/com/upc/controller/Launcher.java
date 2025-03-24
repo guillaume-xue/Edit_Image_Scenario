@@ -11,26 +11,39 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JMenuItem;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 import com.upc.view.MainFrame;
+
+import static java.awt.GraphicsDevice.WindowTranslucency.*;
+
 
 public class Launcher {
 
   private MainFrame mainFrame;
+  private ImageEditor imageEditor;
 
   public Launcher() {
     // Créer et afficher le splash screen
     JWindow splashScreen = creerSplashScreen();
     splashScreen.setVisible(true);
+
+    imageEditor = new ImageEditor();
+
     // Programmer le lancement de la fenêtre principale après 3 secondes
     Timer timer = new Timer(1000, e -> {
       // Ajouter l'effet de fondu avant de fermer
       fadeOut(splashScreen);
       splashScreen.dispose();
-      this.mainFrame = new MainFrame();
+      this.mainFrame = new MainFrame(imageEditor.getImageEditPanel());
       initMenuBarController();
     });
+    
     timer.setRepeats(false);
     timer.start();
+
+
   }
 
   private static JWindow creerSplashScreen() {
@@ -57,16 +70,29 @@ public class Launcher {
   }
 
   private static void fadeOut(JWindow window) {
-    float opacity = 1.0f;
-    while (opacity > 0.0f) {
-      window.setOpacity(opacity);
-      opacity -= 0.1f;
-      try {
-        Thread.sleep(50);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    GraphicsDevice gd = ge.getDefaultScreenDevice();
+
+    boolean isUniformTranslucencySupported =
+        gd.isWindowTranslucencySupported(TRANSLUCENT);
+    boolean isPerPixelTranslucencySupported =
+        gd.isWindowTranslucencySupported(PERPIXEL_TRANSLUCENT);
+    boolean isShapedWindowSupported =
+        gd.isWindowTranslucencySupported(PERPIXEL_TRANSPARENT);
+
+    if(isPerPixelTranslucencySupported && isShapedWindowSupported && isUniformTranslucencySupported){
+      float opacity = 1.0f;
+      while (opacity > 0.0f) {
+        window.setOpacity(opacity);
+        opacity -= 0.1f;
+        try {
+          Thread.sleep(50);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       }
     }
+    
   }
 
   private void initMenuBarController() {
