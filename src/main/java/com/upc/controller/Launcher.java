@@ -13,6 +13,9 @@ import java.awt.Font;
 import com.upc.view.MainFrame;
 
 public class Launcher {
+
+  private MainFrame mainFrame;
+
   public Launcher() {
     // Créer et afficher le splash screen
     JWindow splashScreen = creerSplashScreen();
@@ -23,7 +26,7 @@ public class Launcher {
       // Ajouter l'effet de fondu avant de fermer
       fadeOut(splashScreen);
       splashScreen.dispose();
-      new MainFrame();
+      this.mainFrame = new MainFrame();
     });
     timer.setRepeats(false);
     timer.start();

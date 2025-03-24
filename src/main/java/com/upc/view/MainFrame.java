@@ -1,20 +1,20 @@
 package com.upc.view;
 
+import com.upc.controller.MenuBarController;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-
 import java.awt.BorderLayout;
 
 public class MainFrame extends JFrame {
     private ViewPanel viewPanel;
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
+    private JMenuBar menuBar;
 
     public MainFrame() {
         init();
-
         // Configurer le menu pour Mac
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
@@ -43,18 +43,20 @@ public class MainFrame extends JFrame {
         JMenuItem openItem = new JMenuItem("Open");
         JMenuItem saveItem = new JMenuItem("Save");
         JMenuItem exitItem = new JMenuItem("Exit");
-        fileMenu.add(openItem);
+
         fileMenu.add(openItem);
         fileMenu.add(saveItem);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
         menuBar.add(fileMenu);
+
         JMenu editMenu = new JMenu("Edit");
         JMenuItem undoItem = new JMenuItem("Undo");
         JMenuItem redoItem = new JMenuItem("Redo");
         editMenu.add(undoItem);
         editMenu.add(redoItem);
         menuBar.add(editMenu);
+
         this.setJMenuBar(menuBar);
     }
 
