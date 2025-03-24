@@ -1,6 +1,5 @@
 package com.upc.view;
 
-import com.upc.controller.MenuBarController;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -11,7 +10,6 @@ public class MainFrame extends JFrame {
     private ViewPanel viewPanel;
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
-    private JMenuBar menuBar;
 
     public MainFrame() {
         init();
@@ -39,6 +37,7 @@ public class MainFrame extends JFrame {
 
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
+
         JMenu fileMenu = new JMenu("File");
         JMenuItem openItem = new JMenuItem("Open");
         JMenuItem saveItem = new JMenuItem("Save");
@@ -53,11 +52,28 @@ public class MainFrame extends JFrame {
         JMenu editMenu = new JMenu("Edit");
         JMenuItem undoItem = new JMenuItem("Undo");
         JMenuItem redoItem = new JMenuItem("Redo");
+
         editMenu.add(undoItem);
         editMenu.add(redoItem);
         menuBar.add(editMenu);
 
         this.setJMenuBar(menuBar);
+    }
+
+    public JMenuItem getMenuItem(int menuIndex, int itemIndex) {
+        JMenuBar menuBar = this.getJMenuBar();
+        if (menuBar == null || menuIndex < 0 || menuIndex >= menuBar.getMenuCount()) {
+            System.err.println("Invalid menu index: " + menuIndex);
+            return null;
+        }
+
+        JMenu menu = menuBar.getMenu(menuIndex);
+        if (menu == null || itemIndex < 0 || itemIndex >= menu.getItemCount()) {
+            System.err.println("Invalid item index: " + itemIndex + " in menu: " + menuIndex);
+            return null;
+        }
+
+        return menu.getItem(itemIndex);
     }
 
 }

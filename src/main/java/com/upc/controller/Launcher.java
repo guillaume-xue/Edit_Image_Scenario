@@ -10,6 +10,7 @@ import javax.swing.Timer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import javax.swing.JMenuItem;
 import com.upc.view.MainFrame;
 
 public class Launcher {
@@ -20,13 +21,13 @@ public class Launcher {
     // Créer et afficher le splash screen
     JWindow splashScreen = creerSplashScreen();
     splashScreen.setVisible(true);
-
     // Programmer le lancement de la fenêtre principale après 3 secondes
     Timer timer = new Timer(1000, e -> {
       // Ajouter l'effet de fondu avant de fermer
       fadeOut(splashScreen);
       splashScreen.dispose();
       this.mainFrame = new MainFrame();
+      initMenuBarController();
     });
     timer.setRepeats(false);
     timer.start();
@@ -65,6 +66,37 @@ public class Launcher {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
+    }
+  }
+
+  private void initMenuBarController() {
+    JMenuItem openItem = mainFrame.getMenuItem(0, 0);
+    if (openItem != null) {
+      openItem.addActionListener(e -> MenuBarController.openFile());
+    }
+
+    JMenuItem saveItem = mainFrame.getMenuItem(0, 1);
+    if (saveItem != null) {
+      saveItem.addActionListener(e -> MenuBarController.saveFile());
+    }
+
+    JMenuItem exitItem = mainFrame.getMenuItem(0, 2);
+    if (exitItem != null) {
+      exitItem.addActionListener(e -> System.exit(0));
+    }
+
+    JMenuItem undoItem = mainFrame.getMenuItem(1, 0);
+    if (undoItem != null) {
+      undoItem.addActionListener(e -> {
+        // Add logic for undo operation
+      });
+    }
+
+    JMenuItem redoItem = mainFrame.getMenuItem(1, 1);
+    if (redoItem != null) {
+      redoItem.addActionListener(e -> {
+        // Add logic for redo operation
+      });
     }
   }
 
