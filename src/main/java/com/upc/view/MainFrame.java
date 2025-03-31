@@ -4,6 +4,8 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JSplitPane;
+
 import java.awt.BorderLayout;
 
 public class MainFrame extends JFrame {
@@ -21,10 +23,15 @@ public class MainFrame extends JFrame {
         viewPanel = new ViewPanel(path);
         timeLinePanel = new TimeLinePanel();
 
-        this.setLayout(new BorderLayout());
-        this.add(viewPanel, BorderLayout.EAST);
-        this.add(timeLinePanel, BorderLayout.SOUTH);
-        this.add(imageEditPanel, BorderLayout.WEST);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(200);
+        splitPane.setLeftComponent(imageEditPanel);
+        splitPane.setRightComponent(viewPanel);
+        JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        mainSplitPane.setDividerLocation(400);
+        mainSplitPane.setTopComponent(splitPane);
+        mainSplitPane.setBottomComponent(timeLinePanel);
+        add(mainSplitPane);
     }
 
     private void init() {
