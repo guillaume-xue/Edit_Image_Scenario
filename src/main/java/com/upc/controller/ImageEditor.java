@@ -10,6 +10,8 @@ import java.awt.*;
 public class ImageEditor {
     private ImageEditorModel model;
     private ImageEditPanel view;
+    private JPopupMenu thicknessPopup;
+
 
     public ImageEditor() {
         this.model = new ImageEditorModel();
@@ -41,7 +43,7 @@ public class ImageEditor {
         view.addToolBarButton(colorButton);
 
         // Créer les panneaux de dessin
-        DrawingPanel panel1 = new DrawingPanel(); // Passez temporairement null
+        DrawingPanel panel1 = new DrawingPanel();
         DrawingPanel panel2 = new DrawingPanel();
 
         // Configurer les contrôleurs après la création des panneaux
@@ -52,6 +54,9 @@ public class ImageEditor {
         panel2.setController(controller2);
         view.addDrawingPanel("Dessin 1", panel1);
         view.addDrawingPanel("Dessin 2", panel2);
+
+        initThicknessPopup();
+
     }
 
     private void initController() {
@@ -59,29 +64,56 @@ public class ImageEditor {
         for (Component component : view.getToolBarComponents()) { // Utiliser une méthode dédiée
             if (component instanceof JButton) {
                 JButton button = (JButton) component;
-                button.addActionListener(e -> handleToolSelection(button.getText()));
+                button.addActionListener(e -> handleToolSelection(button));
             }
         }
     }
 
-    private void handleToolSelection(String tool) {
+    private void initThicknessPopup() {
+        thicknessPopup = new JPopupMenu();
+        JSlider thicknessSlider = new JSlider(0, 100, model.getStrokeWidth()+1); // Min: 1, Max: 20
+        thicknessSlider.setPaintTicks(true);
+        thicknessSlider.setPaintLabels(true);
+        thicknessSlider.setMajorTickSpacing(20);
+        thicknessSlider.setMinorTickSpacing(10);
+
+        thicknessSlider.addChangeListener(e -> {
+            int thickness = thicknessSlider.getValue();
+            model.setStrokeWidth(thickness);
+        });
+
+        thicknessPopup.add(thicknessSlider);
+    }
+
+    private void handleToolSelection(JButton button) {
+        String tool = button.getText();
+
         switch (tool) {
             case "Stylo":
                 model.setSelectedTool(0);
+                showThicknessPopup(button); // Afficher le popup
                 break;
             case "Gomme":
                 model.setSelectedTool(1);
+                showThicknessPopup(button); // Afficher le popup
                 break;
             case "Cercle":
                 model.setSelectedTool(2);
+                showThicknessPopup(button); // Afficher le popup
                 break;
             case "Carré":
                 model.setSelectedTool(3);
+                showThicknessPopup(button); // Afficher le popup
                 break;
             case "Couleur":
                 Color selectedColor = JColorChooser.showDialog(null, "Choisissez une couleur", null);
                 model.setSelectedColor(selectedColor);
                 break;
         }
+    }
+    private void showThicknessPopup(JButton button) {
+        // Obtenir la position du bouton
+        Point location = button.getLocationOnScreen();
+        thicknessPopup.show(button, 0, button.getHeight());
     }
 }

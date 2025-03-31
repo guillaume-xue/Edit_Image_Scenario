@@ -1,12 +1,12 @@
 package com.upc.view;
 
-
 import javax.swing.*;
 import java.awt.*;
 
 public class ImageEditPanel extends JPanel {
     private JToolBar toolBar;
     private JTabbedPane tabbedPane;
+    private JSlider thicknessSlider;
 
     public ImageEditPanel() {
         super();
@@ -32,5 +32,9 @@ public class ImageEditPanel extends JPanel {
 
     public Component[] getToolBarComponents() {
         return toolBar.getComponents();
+    }
+
+    public JSlider getThicknessSlider() {
+        return thicknessSlider;
     }
 }

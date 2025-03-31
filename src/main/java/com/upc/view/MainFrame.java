@@ -14,7 +14,6 @@ public class MainFrame extends JFrame {
     private ImageEditPanel imageEditPanel;
 
     public MainFrame(ImageEditPanel imageEditPanel, String path) {
-        this.imageEditPanel = imageEditPanel;
         init();
         // Configurer le menu pour Mac
         System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -22,6 +21,7 @@ public class MainFrame extends JFrame {
         createMenuBar();
         viewPanel = new ViewPanel(path);
         timeLinePanel = new TimeLinePanel();
+        this.imageEditPanel = imageEditPanel;
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(200);
