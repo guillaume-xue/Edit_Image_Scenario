@@ -11,14 +11,14 @@ public class MainFrame extends JFrame {
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
 
-    public MainFrame(ImageEditPanel imageEditPanel) {
+    public MainFrame(ImageEditPanel imageEditPanel, String path) {
         this.imageEditPanel = imageEditPanel;
         init();
         // Configurer le menu pour Mac
-        // System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         createMenuBar();
-        viewPanel = new ViewPanel();
+        viewPanel = new ViewPanel(path);
         timeLinePanel = new TimeLinePanel();
 
         this.setLayout(new BorderLayout());
@@ -76,6 +76,10 @@ public class MainFrame extends JFrame {
         }
 
         return menu.getItem(itemIndex);
+    }
+
+    public ViewPanel getViewPanel() {
+        return viewPanel;
     }
 
 }
