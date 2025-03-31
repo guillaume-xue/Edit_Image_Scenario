@@ -14,6 +14,8 @@ public class ViewPanel extends JPanel {
   }
 
   public void displayImages(String path) {
+    // Clear existing components
+    removeAll();
     File imageDir = new File(path);
     if (imageDir.exists() && imageDir.isDirectory()) {
       File[] imageFiles = imageDir.listFiles((dir, name) -> {
