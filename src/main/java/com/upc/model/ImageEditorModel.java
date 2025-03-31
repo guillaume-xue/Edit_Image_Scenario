@@ -3,7 +3,7 @@ package com.upc.model;
 import java.awt.Color;
 
 public class ImageEditorModel {
-    int selectedTool = -1;
+    int selectedTool = 0;
     Color selectedColor = new Color(0, 0, 0);
 
     public void setSelectedTool(int selectedTool) {

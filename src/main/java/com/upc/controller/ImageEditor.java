@@ -1,93 +1,87 @@
 package com.upc.controller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-
-import com.upc.view.ImageEditPanel;
 import com.upc.model.ImageEditorModel;
+import com.upc.view.ImageEditPanel;
+import com.upc.view.DrawingPanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class ImageEditor {
-
-    ImageEditorModel imageEditorModel;
-    ImageEditPanel imageEditPanel;
-
-    public ImageEditPanel getImageEditPanel() {
-        return imageEditPanel;
-    }
+    private ImageEditorModel model;
+    private ImageEditPanel view;
 
     public ImageEditor() {
-        imageEditorModel = new ImageEditorModel();
-        imageEditPanel = new ImageEditPanel(this, imageEditorModel);
+        this.model = new ImageEditorModel();
+        this.view = new ImageEditPanel();
+        initView();
+        initController();
     }
-    
-    public void imageEditorTopButton(JButton button){
-        switch (button.getText()) {
-            case "Stylo":
-                button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        imageEditorModel.setSelectedTool(0);
-                    }
-                });
-                break;
-            case "Gomme":
-                button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        imageEditorModel.setSelectedTool(1);
-                    }
-                });
-                break;
-            case "Cercle":
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    imageEditorModel.setSelectedTool(2);
-                }
-            });
-                break;
-            case "Carré":
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    imageEditorModel.setSelectedTool(3);
-                }
-            });
-                break;
-            case "Couleur":
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    java.awt.Color selectedColor = javax.swing.JColorChooser.showDialog(null, "Choisissez une couleur", null);
-                    imageEditorModel.setSelectedColor(selectedColor);
-                }
-            });
-                break;
-            default:
-                break;
+
+    public ImageEditorModel getImageEditorModel() {
+        return model;
+    }
+
+    public ImageEditPanel getImageEditPanel() {
+        return view;
+    }
+
+    private void initView() {
+        // Ajouter les boutons à la barre d'outils
+        JButton penButton = new JButton("Stylo");
+        JButton eraserButton = new JButton("Gomme");
+        JButton circleButton = new JButton("Cercle");
+        JButton squareButton = new JButton("Carré");
+        JButton colorButton = new JButton("Couleur");
+
+        view.addToolBarButton(penButton);
+        view.addToolBarButton(eraserButton);
+        view.addToolBarButton(circleButton);
+        view.addToolBarButton(squareButton);
+        view.addToolBarButton(colorButton);
+
+        // Créer les panneaux de dessin
+        DrawingPanel panel1 = new DrawingPanel(); // Passez temporairement null
+        DrawingPanel panel2 = new DrawingPanel();
+
+        // Configurer les contrôleurs après la création des panneaux
+        DrawingController controller1 = new DrawingController(panel1, model);
+        DrawingController controller2 = new DrawingController(panel2, model);
+
+        panel1.setController(controller1); // Associez le contrôleur au panneau
+        panel2.setController(controller2);
+        view.addDrawingPanel("Dessin 1", panel1);
+        view.addDrawingPanel("Dessin 2", panel2);
+    }
+
+    private void initController() {
+        // Ajouter des actions aux boutons
+        for (Component component : view.getToolBarComponents()) { // Utiliser une méthode dédiée
+            if (component instanceof JButton) {
+                JButton button = (JButton) component;
+                button.addActionListener(e -> handleToolSelection(button.getText()));
+            }
         }
     }
 
-    public void imageEditorMainPanel(JPanel panel){
-        panel.addMouseListener(new java.awt.event.MouseAdapter() {
-            // @Override
-            // public void mousePressed(java.awt.event.MouseEvent e) {
-            //     int x = e.getX();
-            //     int y = e.getY();
-            //     imageEditPanel.drawAt(x, y);
-            // }
-            
-            @Override
-            public void mouseDragged(java.awt.event.MouseEvent e) {
-                int x = e.getX();
-                int y = e.getY();
-                imageEditPanel.drawAt(x, y);
-            }
-        });
+    private void handleToolSelection(String tool) {
+        switch (tool) {
+            case "Stylo":
+                model.setSelectedTool(0);
+                break;
+            case "Gomme":
+                model.setSelectedTool(1);
+                break;
+            case "Cercle":
+                model.setSelectedTool(2);
+                break;
+            case "Carré":
+                model.setSelectedTool(3);
+                break;
+            case "Couleur":
+                Color selectedColor = JColorChooser.showDialog(null, "Choisissez une couleur", null);
+                model.setSelectedColor(selectedColor);
+                break;
+        }
     }
-
-
 }

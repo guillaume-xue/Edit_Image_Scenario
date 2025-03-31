@@ -7,7 +7,9 @@ import java.io.File;
 public class ViewPanel extends JPanel {
 
   public ViewPanel(String path) {
+    super();
     setLayout(new GridLayout(0, 4, 10, 10)); // Grid with 4 columns and spacing
+    setPreferredSize(new Dimension(400, 400)); // Set preferred size for the panel
     displayImages(path);
   }
 
