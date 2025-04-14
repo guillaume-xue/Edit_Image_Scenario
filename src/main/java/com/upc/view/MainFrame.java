@@ -89,4 +89,8 @@ public class MainFrame extends JFrame {
         return viewPanel;
     }
 
+    public TimeLinePanel getTimeLinePanel() {
+        return timeLinePanel;
+    }
+
 }
