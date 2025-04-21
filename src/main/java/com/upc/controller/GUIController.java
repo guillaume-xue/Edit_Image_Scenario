@@ -10,12 +10,10 @@ import java.util.Properties;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
-import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.upc.model.ViewImage;
 import com.upc.view.MainFrame;
-import com.upc.controller.MouseController.DragMouseAdapter;
 
 public class GUIController {
 
@@ -73,7 +71,6 @@ public class GUIController {
             ImageIcon resizedIcon = new ImageIcon(resizedImage);
             viewImage.addImageIcon(resizedIcon);
             mainFrame.getViewPanel().displayImages(viewImage.getImageIcons()); // Refresh the view panel
-            new MouseController(mainFrame);
           } catch (IOException ex) {
             ex.printStackTrace();
           }

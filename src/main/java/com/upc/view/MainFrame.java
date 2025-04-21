@@ -5,8 +5,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
-
+import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 public class MainFrame extends JFrame {
     private ViewPanel viewPanel;
@@ -30,7 +31,12 @@ public class MainFrame extends JFrame {
         JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         mainSplitPane.setDividerLocation(400);
         mainSplitPane.setTopComponent(splitPane);
-        mainSplitPane.setBottomComponent(timeLinePanel);
+
+        JScrollPane scrollPane = new JScrollPane(timeLinePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(800, 120)); // Adjust scroll pane size if needed
+        mainSplitPane.setBottomComponent(scrollPane);
+
         add(mainSplitPane);
     }
 

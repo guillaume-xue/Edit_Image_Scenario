@@ -1,6 +1,10 @@
 package com.upc.view;
 
 import javax.swing.*;
+
+import com.upc.controller.MouseController;
+import com.upc.controller.TransferController;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -19,7 +23,8 @@ public class ViewPanel extends JPanel {
     if (imageIcons != null && !imageIcons.isEmpty()) {
       for (ImageIcon imageIcon : imageIcons) {
         JLabel imageLabel = new JLabel(imageIcon);
-        imageLabel.setTransferHandler(new TransferHandler("icon")); // Enable drag-and-drop for the icon
+        imageLabel.setTransferHandler(new TransferController()); // Enable drag functionality
+        imageLabel.addMouseListener(new MouseController());
         add(imageLabel);
       }
     } else {
@@ -28,7 +33,6 @@ public class ViewPanel extends JPanel {
     }
     revalidate(); // Refresh layout
     repaint(); // Repaint the panel
-
   }
 
   public ArrayList<JLabel> getImageLabels() {
