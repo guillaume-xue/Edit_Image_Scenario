@@ -5,18 +5,18 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 
 import com.upc.controller.MouseController;
 import com.upc.controller.TransferController;
 
-import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 public class MainFrame extends JFrame {
     private ViewPanel viewPanel;
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
+    private AnimeViewPanel animeViewPanel;
 
     public MainFrame(ImageEditPanel imageEditPanel, TransferController transferController,
             MouseController mouseController, String path) {
@@ -27,20 +27,23 @@ public class MainFrame extends JFrame {
 
         createMenuBar();
         viewPanel = new ViewPanel(path, transferController, mouseController);
-        timeLinePanel = new TimeLinePanel(transferController, mouseController);
 
+        this.animeViewPanel = new AnimeViewPanel();
+        timeLinePanel = new TimeLinePanel(transferController, mouseController, animeViewPanel);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(400);
-        splitPane.setLeftComponent(imageEditPanel);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setTabPlacement(JTabbedPane.LEFT);
+        tabbedPane.addTab("Draw", imageEditPanel);
+        tabbedPane.addTab("Animation", animeViewPanel);
+
+        splitPane.setLeftComponent(tabbedPane);
         splitPane.setRightComponent(viewPanel);
         JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         mainSplitPane.setDividerLocation(400);
         mainSplitPane.setTopComponent(splitPane);
 
-        JScrollPane scrollPane = new JScrollPane(timeLinePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setPreferredSize(new Dimension(800, 120)); // Adjust scroll pane size if needed
-        mainSplitPane.setBottomComponent(scrollPane);
+        mainSplitPane.setBottomComponent(timeLinePanel);
 
         add(mainSplitPane);
     }
