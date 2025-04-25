@@ -5,6 +5,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
+
+import com.upc.controller.MouseController;
+import com.upc.controller.TransferController;
+
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -14,18 +18,19 @@ public class MainFrame extends JFrame {
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
 
-    public MainFrame(ImageEditPanel imageEditPanel, String path) {
+    public MainFrame(ImageEditPanel imageEditPanel, TransferController transferController,
+            MouseController mouseController, String path) {
         this.imageEditPanel = imageEditPanel;
         init();
         // Configurer le menu pour Mac
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         createMenuBar();
-        viewPanel = new ViewPanel(path);
-        timeLinePanel = new TimeLinePanel();
+        viewPanel = new ViewPanel(path, transferController, mouseController);
+        timeLinePanel = new TimeLinePanel(transferController, mouseController);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(200);
+        splitPane.setDividerLocation(400);
         splitPane.setLeftComponent(imageEditPanel);
         splitPane.setRightComponent(viewPanel);
         JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);

@@ -10,11 +10,16 @@ import java.util.ArrayList;
 
 public class ViewPanel extends JPanel {
 
-  public ViewPanel(String path) {
+  private TransferController transferController;
+  private MouseController mouseController;
+
+  public ViewPanel(String path, TransferController transferController, MouseController mouseController) {
     super();
     setLayout(new GridLayout(0, 4, 10, 10)); // Grid with 4 columns and spacing
     setPreferredSize(new Dimension(400, 400)); // Set preferred size for the panel
     displayImages(null);
+    this.transferController = transferController;
+    this.mouseController = mouseController;
   }
 
   public void displayImages(ArrayList<ImageIcon> imageIcons) {
@@ -23,8 +28,8 @@ public class ViewPanel extends JPanel {
     if (imageIcons != null && !imageIcons.isEmpty()) {
       for (ImageIcon imageIcon : imageIcons) {
         JLabel imageLabel = new JLabel(imageIcon);
-        imageLabel.setTransferHandler(new TransferController()); // Enable drag functionality
-        imageLabel.addMouseListener(new MouseController());
+        imageLabel.setTransferHandler(transferController.new TransferViewPanel()); // Enable drag functionality
+        imageLabel.addMouseListener(mouseController.new ViewPanelMouseController());
         add(imageLabel);
       }
     } else {

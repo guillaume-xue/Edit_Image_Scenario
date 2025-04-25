@@ -20,6 +20,8 @@ public class GUIController {
   private MainFrame mainFrame;
   private ImageEditor imageEditor;
   private ViewImage viewImage;
+  private TransferController transferController;
+  private MouseController mouseController;
 
   public GUIController() {
     // Créer et afficher le splash screen
@@ -39,9 +41,11 @@ public class GUIController {
         if (!directory.exists()) {
           directory.mkdirs(); // Create the directory if it doesn't exist
         }
-
+        this.transferController = new TransferController();
+        this.mouseController = new MouseController();
         imageEditor = new ImageEditor();
-        this.mainFrame = new MainFrame(imageEditor.getImageEditPanel(), imageDirectory);
+        this.mainFrame = new MainFrame(imageEditor.getImageEditPanel(), transferController, mouseController,
+            imageDirectory);
         initMenuBarController(imageDirectory);
       } else {
         System.err.println("Image directory not specified in properties file.");
