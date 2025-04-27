@@ -2,6 +2,7 @@ package com.upc.controller;
 
 import com.upc.model.ImageEditorModel;
 import com.upc.view.ImageEditPanel;
+import com.upc.view.ImageEditPanel.ClosableTabComponent;
 import com.upc.view.DrawingPanel;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ public class ImageEditor {
     private ImageEditorModel model;
     private ImageEditPanel view;
     private JPopupMenu thicknessPopup;
+    private int cpt = 0;
 
 
     public ImageEditor() {
@@ -30,12 +32,14 @@ public class ImageEditor {
 
     private void initView() {
         // Ajouter les boutons à la barre d'outils
+        JButton add = new JButton("+");
         JButton penButton = new JButton("Stylo");
         JButton eraserButton = new JButton("Gomme");
         JButton circleButton = new JButton("Cercle");
         JButton squareButton = new JButton("Carré");
         JButton colorButton = new JButton("Couleur");
 
+        view.addToolBarButton(add);
         view.addToolBarButton(penButton);
         view.addToolBarButton(eraserButton);
         view.addToolBarButton(circleButton);
@@ -54,7 +58,7 @@ public class ImageEditor {
         panel2.setController(controller2);
         view.addDrawingPanel("Dessin 1", panel1);
         view.addDrawingPanel("Dessin 2", panel2);
-
+        cpt+=2;
         initThicknessPopup();
 
     }
@@ -108,6 +112,12 @@ public class ImageEditor {
             case "Couleur":
                 Color selectedColor = JColorChooser.showDialog(null, "Choisissez une couleur", null);
                 model.setSelectedColor(selectedColor);
+                break;
+            case "+":
+                DrawingPanel newPanel = new DrawingPanel();
+                DrawingController newController = new DrawingController(newPanel, model);
+                newPanel.setController(newController);
+                view.addDrawingPanel("Dessin " + (++cpt), newPanel);
                 break;
         }
     }

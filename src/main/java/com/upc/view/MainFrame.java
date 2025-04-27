@@ -24,7 +24,7 @@ public class MainFrame extends JFrame {
         this.imageEditPanel = imageEditPanel;
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(200);
+        splitPane.setDividerLocation(400);
         splitPane.setLeftComponent(imageEditPanel);
         splitPane.setRightComponent(viewPanel);
         JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -35,7 +35,7 @@ public class MainFrame extends JFrame {
     }
 
     private void init() {
-        this.setSize(800, 600);
+        this.setSize(1280, 720);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Image Editor");
         this.setLocationRelativeTo(null);
