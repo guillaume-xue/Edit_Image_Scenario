@@ -16,7 +16,6 @@ public class DrawingPanel extends JPanel {
     private boolean isPreviewing = false;
     private String previewShape = ""; // "Cercle" ou "Carré"
 
-
     public DrawingPanel() {
         super();
         setBackground(Color.WHITE);

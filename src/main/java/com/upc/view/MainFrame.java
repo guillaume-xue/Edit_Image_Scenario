@@ -5,6 +5,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+
+import com.upc.controller.MouseController;
+import com.upc.controller.TransferController;
 
 import java.awt.BorderLayout;
 
@@ -12,25 +16,35 @@ public class MainFrame extends JFrame {
     private ViewPanel viewPanel;
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
+    private AnimeViewPanel animeViewPanel;
 
-    public MainFrame(ImageEditPanel imageEditPanel, String path) {
+    public MainFrame(ImageEditPanel imageEditPanel, TransferController transferController,
+            MouseController mouseController, String path) {
+        this.imageEditPanel = imageEditPanel;
         init();
         // Configurer le menu pour Mac
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         createMenuBar();
-        viewPanel = new ViewPanel(path);
-        timeLinePanel = new TimeLinePanel();
-        this.imageEditPanel = imageEditPanel;
+        viewPanel = new ViewPanel(path, transferController, mouseController);
 
+        this.animeViewPanel = new AnimeViewPanel();
+        timeLinePanel = new TimeLinePanel(transferController, mouseController, animeViewPanel);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(400);
-        splitPane.setLeftComponent(imageEditPanel);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setTabPlacement(JTabbedPane.LEFT);
+        tabbedPane.addTab("Draw", imageEditPanel);
+        tabbedPane.addTab("Animation", animeViewPanel);
+
+        splitPane.setLeftComponent(tabbedPane);
         splitPane.setRightComponent(viewPanel);
         JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         mainSplitPane.setDividerLocation(400);
         mainSplitPane.setTopComponent(splitPane);
+
         mainSplitPane.setBottomComponent(timeLinePanel);
+
         add(mainSplitPane);
     }
 
@@ -87,6 +101,10 @@ public class MainFrame extends JFrame {
 
     public ViewPanel getViewPanel() {
         return viewPanel;
+    }
+
+    public TimeLinePanel getTimeLinePanel() {
+        return timeLinePanel;
     }
 
 }

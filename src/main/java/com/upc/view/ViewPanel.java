@@ -1,38 +1,36 @@
 package com.upc.view;
 
 import javax.swing.*;
+
+import com.upc.controller.MouseController;
+import com.upc.controller.TransferController;
+
 import java.awt.*;
-import java.io.File;
+import java.util.ArrayList;
 
 public class ViewPanel extends JPanel {
 
-  public ViewPanel(String path) {
+  private TransferController transferController;
+  private MouseController mouseController;
+
+  public ViewPanel(String path, TransferController transferController, MouseController mouseController) {
     super();
     setLayout(new GridLayout(0, 4, 10, 10)); // Grid with 4 columns and spacing
     setPreferredSize(new Dimension(400, 400)); // Set preferred size for the panel
-    displayImages(path);
+    displayImages(null);
+    this.transferController = transferController;
+    this.mouseController = mouseController;
   }
 
-  public void displayImages(String path) {
+  public void displayImages(ArrayList<ImageIcon> imageIcons) {
     // Clear existing components
     removeAll();
-    File imageDir = new File(path);
-    if (imageDir.exists() && imageDir.isDirectory()) {
-      File[] imageFiles = imageDir.listFiles((dir, name) -> {
-        String lowerName = name.toLowerCase();
-        return lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
-            lowerName.endsWith(".png") || lowerName.endsWith(".gif") ||
-            lowerName.endsWith(".bmp");
-      });
-
-      if (imageFiles != null) {
-        for (File imageFile : imageFiles) {
-          ImageIcon originalIcon = new ImageIcon(imageFile.getAbsolutePath());
-          Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-          ImageIcon resizedIcon = new ImageIcon(resizedImage);
-          JLabel imageLabel = new JLabel(resizedIcon);
-          add(imageLabel);
-        }
+    if (imageIcons != null && !imageIcons.isEmpty()) {
+      for (ImageIcon imageIcon : imageIcons) {
+        JLabel imageLabel = new JLabel(imageIcon);
+        imageLabel.setTransferHandler(transferController.new TransferViewPanel()); // Enable drag functionality
+        imageLabel.addMouseListener(mouseController.new ViewPanelMouseController());
+        add(imageLabel);
       }
     } else {
       JLabel noImagesLabel = new JLabel("No images found in /resources/image");
@@ -40,5 +38,15 @@ public class ViewPanel extends JPanel {
     }
     revalidate(); // Refresh layout
     repaint(); // Repaint the panel
+  }
+
+  public ArrayList<JLabel> getImageLabels() {
+    ArrayList<JLabel> labels = new ArrayList<>();
+    for (Component component : getComponents()) {
+      if (component instanceof JLabel) {
+        labels.add((JLabel) component);
+      }
+    }
+    return labels;
   }
 }
