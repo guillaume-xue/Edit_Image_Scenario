@@ -73,6 +73,7 @@ public class GUIController {
             ImageIcon originalIcon = new ImageIcon(selectedFile.getAbsolutePath());
             Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(resizedImage);
+            resizedIcon.setDescription(selectedFile.getAbsolutePath());
             viewImage.addImageIcon(resizedIcon);
             mainFrame.getViewPanel().displayImages(viewImage.getImageIcons()); // Refresh the view panel
           } catch (IOException ex) {

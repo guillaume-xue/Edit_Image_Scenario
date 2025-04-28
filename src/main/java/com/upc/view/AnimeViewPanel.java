@@ -1,7 +1,6 @@
 package com.upc.view;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -16,10 +15,12 @@ public class AnimeViewPanel extends JPanel {
     new Thread(() -> {
       for (Map.Entry<ImageIcon, Integer> entry : imageWithDuration) {
         ImageIcon image = entry.getKey();
+        ImageIcon originalIcon = new ImageIcon(image.getDescription());
+
         int duration = entry.getValue();
 
-        JLabel label = new JLabel(image);
-        label.setBounds(0, 0, image.getIconWidth(), image.getIconHeight());
+        JLabel label = new JLabel(originalIcon);
+        label.setBounds(0, 0, originalIcon.getIconWidth(), originalIcon.getIconHeight());
         SwingUtilities.invokeLater(() -> {
           removeAll();
           add(label);

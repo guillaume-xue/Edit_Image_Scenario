@@ -15,11 +15,11 @@ public class DrawingPanel extends JPanel {
     private boolean isPreviewing = false;
     private String previewShape = ""; // "Cercle" ou "Carré"
 
-
     public DrawingPanel() {
         super();
         setBackground(Color.WHITE);
-        dim = new Dimension(500, 500);;
+        dim = new Dimension(500, 500);
+        ;
     }
 
     public void initializeCanvas() {
@@ -74,7 +74,7 @@ public class DrawingPanel extends JPanel {
         gi.drawOval(x, y, width, height);
         repaint();
     }
-    
+
     public void drawRect(int x, int y, int width, int height, Color color) {
         gi.setColor(color);
         gi.drawRect(x, y, width, height);
