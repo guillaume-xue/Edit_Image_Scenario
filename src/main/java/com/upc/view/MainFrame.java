@@ -53,7 +53,6 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Image Editor");
         this.setLocationRelativeTo(null);
-        this.setResizable(false);
         this.setVisible(true);
         this.setLayout(new BorderLayout());
     }

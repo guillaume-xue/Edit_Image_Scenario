@@ -1,6 +1,7 @@
 package com.upc.view;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -13,9 +14,9 @@ import com.upc.controller.MouseController;
 import com.upc.controller.TransferController;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -24,24 +25,35 @@ public class TimeLinePanel extends JPanel {
     private MouseController mouseController;
     private JPanel timeLinePanel;
     private AnimeViewPanel animeViewPanel; // Reference to AnimeViewPanel
+    private DividerPanel currentDividerPanel = null;
 
     public TimeLinePanel(TransferController transferController, MouseController mouseController,
             AnimeViewPanel animeViewPanel) {
         super();
-        setLayout(new BorderLayout());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBackground(Color.WHITE);
+
         this.transferController = transferController;
         this.mouseController = mouseController;
         this.animeViewPanel = animeViewPanel; // Initialize AnimeViewPanel reference
+
         setTransferHandler(this.transferController.new TransferTimeLine(this));
+
         JButton startButton = new JButton("start");
         startButton.addActionListener(e -> startAnimation()); // Add ActionListener
         this.add(startButton, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+
         this.timeLinePanel = new JPanel();
-        this.timeLinePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        JScrollPane scrollPane = new JScrollPane(timeLinePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setPreferredSize(new Dimension(800, 120));
+        timeLinePanel.setLayout(new BoxLayout(timeLinePanel, BoxLayout.X_AXIS));
+        scrollPane.setViewportView(timeLinePanel);
+
+        this.add(Box.createHorizontalStrut(40));
         this.add(scrollPane, BorderLayout.CENTER);
+        this.add(Box.createHorizontalStrut(40));
     }
 
     private void startAnimation() {
@@ -49,42 +61,38 @@ public class TimeLinePanel extends JPanel {
     }
 
     public void addImageLabel(ImageIcon imageIcon) {
-        // Create a vertical box to hold the image and text field
-        Box verticalBox = Box.createVerticalBox();
-
-        JLabel label = new JLabel(imageIcon);
-        // Make the textField accept only integers
-
-        JTextField textField = new JTextField("");
-        textField.addKeyListener(new KeyController().new TextFieldKeyListener());
-        textField.setMaximumSize(new Dimension(100, 30)); // Set maximum size for JTextField
-
-        // Add mouse listener for double-click removal
-        verticalBox.addMouseListener(mouseController.new TimeLinePanelMouseController(verticalBox, this));
-
-        verticalBox.add(label);
-        verticalBox.add(textField);
-        timeLinePanel.add(verticalBox);
+        ResizablePanel resizablePanel = new ResizablePanel(imageIcon);
+        ResizablePanel emptyPanel = new ResizablePanel();
+        timeLinePanel.add(resizablePanel);
+        if (currentDividerPanel != null) {
+            timeLinePanel.remove(timeLinePanel.getComponentCount() - 2);
+            currentDividerPanel = new DividerPanel(currentDividerPanel, resizablePanel, emptyPanel);
+        } else {
+            currentDividerPanel = new DividerPanel(null, resizablePanel, emptyPanel);
+        }
+        this.addMouseListener(mouseController.new TimeLinePanelMouseController(null, null));
+        timeLinePanel.add(currentDividerPanel);
+        timeLinePanel.add(emptyPanel);
         timeLinePanel.revalidate(); // Refresh layout
         timeLinePanel.repaint(); // Repaint the panel
     }
 
     public ArrayList<Map.Entry<ImageIcon, Integer>> getImageCopiesWithDurations() {
         ArrayList<Map.Entry<ImageIcon, Integer>> imageCopiesWithDurations = new ArrayList<>();
-        for (Component component : timeLinePanel.getComponents()) {
-            if (component instanceof Box) {
-                Box verticalBox = (Box) component;
-                if (verticalBox.getComponent(0) instanceof JLabel
-                        && verticalBox.getComponent(1) instanceof JTextField) {
-                    JLabel label = (JLabel) verticalBox.getComponent(0);
-                    JTextField textField = (JTextField) verticalBox.getComponent(1);
-                    ImageIcon imageIcon = (ImageIcon) label.getIcon();
-                    int duration = textField.getText().isEmpty() ? 0
-                            : Integer.parseInt(textField.getText().trim());
-                    imageCopiesWithDurations.add(Map.entry(imageIcon, duration));
-                }
+        DividerPanel tmp = currentDividerPanel;
+        while (tmp != null) {
+            ResizablePanel left = tmp.getLeft();
+            if (left != null && left.getIcon() != null) {
+                imageCopiesWithDurations.add(Map.entry(left.getIcon(), left.getDuration()));
             }
+            tmp = tmp.getPrecDividerPanel();
         }
+        // Reverse the list to maintain the correct order
+        ArrayList<Map.Entry<ImageIcon, Integer>> reversedList = new ArrayList<>();
+        for (int i = imageCopiesWithDurations.size() - 1; i >= 0; i--) {
+            reversedList.add(imageCopiesWithDurations.get(i));
+        }
+        imageCopiesWithDurations = reversedList;
         return imageCopiesWithDurations;
     }
 }

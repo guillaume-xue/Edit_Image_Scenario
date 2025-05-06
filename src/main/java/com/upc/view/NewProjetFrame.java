@@ -2,7 +2,6 @@ package com.upc.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -159,7 +158,7 @@ public class NewProjetFrame extends JFrame {
 
     mainPanel.add(Box.createVerticalStrut(20));
     mainPanel.add(folderChooserPanel);
-    mainPanel.add(Box.createVerticalStrut(320));
+    mainPanel.add(Box.createVerticalStrut(370));
     mainPanel.add(buttunPanel);
 
     return mainPanel;

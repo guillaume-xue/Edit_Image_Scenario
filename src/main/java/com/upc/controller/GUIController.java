@@ -79,6 +79,7 @@ public class GUIController {
     });
 
     optionFrame.getOpenProjet().addActionListener(e -> {
+      optionFrame.dispose();
       JFileChooser fileChooser = new JFileChooser();
       fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       int returnValue = fileChooser.showOpenDialog(optionFrame);
