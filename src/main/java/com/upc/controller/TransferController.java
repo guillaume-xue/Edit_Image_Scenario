@@ -32,7 +32,7 @@ public class TransferController {
             (Image) support.getTransferable().getTransferData(DataFlavor.imageFlavor));
         String description = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
         imageIcon.setDescription(description);
-        timeLinePanel.addImageLabel(imageIcon); // Add the vertical box to the timeLinePanel
+        timeLinePanel.addImageLabel(imageIcon, 100); // Add the vertical box to the timeLinePanel
         return true;
       } catch (UnsupportedFlavorException | java.io.IOException e) {
         e.printStackTrace();

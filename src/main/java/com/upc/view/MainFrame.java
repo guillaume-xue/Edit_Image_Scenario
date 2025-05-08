@@ -7,27 +7,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
-import com.upc.controller.MouseController;
-import com.upc.controller.TransferController;
-
 import java.awt.BorderLayout;
 
 public class MainFrame extends JFrame {
-    private TimeLinePanel timeLinePanel;
-    private ImageEditPanel imageEditPanel;
-    private AnimeViewPanel animeViewPanel;
 
-    public MainFrame(ImageEditPanel imageEditPanel, TransferController transferController,
-            MouseController mouseController, ViewPanel viewPanel) {
-        this.imageEditPanel = imageEditPanel;
+    public MainFrame(ImageEditPanel imageEditPanel, ViewPanel viewPanel, TimeLinePanel timeLinePanel,
+            AnimeViewPanel animeViewPanel) {
         init();
         // Configurer le menu pour Mac
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         createMenuBar();
-
-        timeLinePanel = new TimeLinePanel(transferController, mouseController, animeViewPanel);
-        this.animeViewPanel = new AnimeViewPanel(timeLinePanel);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(400);
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -96,10 +86,6 @@ public class MainFrame extends JFrame {
         }
 
         return menu.getItem(itemIndex);
-    }
-
-    public TimeLinePanel getTimeLinePanel() {
-        return timeLinePanel;
     }
 
 }

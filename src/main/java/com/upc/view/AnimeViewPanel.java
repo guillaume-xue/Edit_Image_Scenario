@@ -6,21 +6,16 @@ import javax.swing.*;
 import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class AnimeViewPanel extends JPanel {
 
   private JPanel animeViewPanel;
   private JButton startButton;
   private JButton breakButton;
-  private TimeLinePanel timeLinePanel;
 
-  public AnimeViewPanel(TimeLinePanel timeLinePanel) {
+  public AnimeViewPanel() {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-    this.timeLinePanel = timeLinePanel;
 
     animeViewPanel = new JPanel();
     animeViewPanel.setLayout(new BoxLayout(animeViewPanel, BoxLayout.X_AXIS));
@@ -45,7 +40,7 @@ public class AnimeViewPanel extends JPanel {
     }
     startButton = new JButton(new ImageIcon(startImg));
     breakButton = new JButton(new ImageIcon(breakImg));
-    startButton.addActionListener(e -> animatePanel(this.timeLinePanel.getImageCopiesWithDurations()));
+
     buttonPanel.add(startButton);
     buttonPanel.add(breakButton);
 
@@ -53,31 +48,7 @@ public class AnimeViewPanel extends JPanel {
     add(buttonPanel);
   }
 
-  public void animatePanel(ArrayList<Map.Entry<ImageIcon, Integer>> imageWithDuration) {
-    new Thread(() -> {
-      for (Map.Entry<ImageIcon, Integer> entry : imageWithDuration) {
-        ImageIcon image = entry.getKey();
-        ImageIcon originalIcon = new ImageIcon(image.getDescription());
-
-        int duration = entry.getValue();
-
-        JLabel label = new JLabel(originalIcon);
-        label.setBounds(0, 0, originalIcon.getIconWidth(), originalIcon.getIconHeight());
-        SwingUtilities.invokeLater(() -> {
-          removeAll();
-          add(label);
-          repaint();
-        });
-
-        try {
-          Thread.sleep(duration);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          break;
-        }
-      }
-      SwingUtilities.invokeLater(this::removeAll);
-    }).start();
+  public JButton getStartButton() {
+    return startButton;
   }
-
 }

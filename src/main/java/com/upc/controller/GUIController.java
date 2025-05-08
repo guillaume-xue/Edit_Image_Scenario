@@ -7,9 +7,11 @@ import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 
+import com.upc.view.AnimeViewPanel;
 import com.upc.view.MainFrame;
 import com.upc.view.NewProjetFrame;
 import com.upc.view.OptionFrame;
+import com.upc.view.TimeLinePanel;
 import com.upc.view.ViewPanel;
 
 public class GUIController {
@@ -18,13 +20,14 @@ public class GUIController {
   private OptionFrame optionFrame;
   private NewProjetFrame newProjetFrame;
 
-  private ViewPanelController viewPanelController;
-
   private ImageEditor imageEditor;
 
   private TransferController transferController;
   private MouseController mouseController;
   private File currentFile;
+  private File imageDir;
+  private File propertiesFile;
+  private File scenarioFile;
 
   public GUIController() {
     initOption();
@@ -43,32 +46,52 @@ public class GUIController {
     initNewProjetFrameListener();
   }
 
-  private void initMain() {
+  private void initMainFrame() {
     Properties properties = new Properties();
 
     // Charger le fichier .properties
     try {
       properties.load(getClass().getResourceAsStream("/resources.properties"));
-      String imageDirectory = properties.getProperty("image.directory");
-      if (imageDirectory != null && !imageDirectory.isEmpty()) {
-        File directory = new File(imageDirectory);
-        if (!directory.exists()) {
-          directory.mkdirs(); // Create the directory if it doesn't exist
-        }
-        this.transferController = new TransferController();
-        this.mouseController = new MouseController();
-        imageEditor = new ImageEditor();
-        ViewPanel viewPanel = new ViewPanel(imageDirectory);
-        this.mainFrame = new MainFrame(imageEditor.getImageEditPanel(), transferController, mouseController, viewPanel);
-
-        this.viewPanelController = new ViewPanelController(viewPanel, mainFrame, transferController, mouseController,
-            imageDirectory);
-        initMenuBarController(imageDirectory);
-      } else {
-        System.err.println("Image directory not specified in properties file.");
-      }
+      this.transferController = new TransferController();
+      this.mouseController = new MouseController();
+      imageEditor = new ImageEditor();
+      ViewPanel viewPanel = new ViewPanel();
+      TimeLinePanel timeLinePanel = new TimeLinePanel();
+      AnimeViewPanel animeViewPanel = new AnimeViewPanel();
+      this.mainFrame = new MainFrame(imageEditor.getImageEditPanel(), viewPanel, timeLinePanel, animeViewPanel);
+      new ViewPanelController(viewPanel, mainFrame, transferController, mouseController, imageDir.getAbsolutePath());
+      TimeLinePanelController timeLinePanelController = new TimeLinePanelController(timeLinePanel, transferController,
+          mouseController);
+      new AnimaViewPanelController(animeViewPanel, timeLinePanelController);
+      initMenuBarController();
     } catch (IOException ex) {
       ex.printStackTrace();
+    }
+  }
+
+  private void initProjectFolder() {
+    imageDir = new File(currentFile, "images");
+    propertiesFile = new File(currentFile, "resources.properties");
+    scenarioFile = new File(currentFile, "scenario.txt");
+    if (!currentFile.exists()) {
+      currentFile.mkdirs(); // Create the directory if it doesn't exist
+    }
+    if (!imageDir.exists()) {
+      imageDir.mkdirs(); // Create the image directory if it doesn't exist
+    }
+    if (!propertiesFile.exists()) {
+      try {
+        propertiesFile.createNewFile(); // Create the properties file if it doesn't exist
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
+    }
+    if (!scenarioFile.exists()) {
+      try {
+        scenarioFile.createNewFile(); // Create the scenario file if it doesn't exist
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
     }
   }
 
@@ -79,14 +102,14 @@ public class GUIController {
     });
 
     optionFrame.getOpenProjet().addActionListener(e -> {
-      optionFrame.dispose();
       JFileChooser fileChooser = new JFileChooser();
       fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       int returnValue = fileChooser.showOpenDialog(optionFrame);
       if (returnValue == JFileChooser.APPROVE_OPTION) {
-        File selectedDirectory = fileChooser.getSelectedFile();
-        currentFile = selectedDirectory;
-        initMain(); // Initialize the main frame
+        optionFrame.dispose();
+        currentFile = fileChooser.getSelectedFile();
+        initProjectFolder(); // Initialize the project folder
+        initMainFrame(); // Initialize the main frame
       }
     });
   }
@@ -95,27 +118,11 @@ public class GUIController {
     newProjetFrame.getCreateButton().addActionListener(e -> {
       String name = newProjetFrame.getNameTextArea().getText();
       String location = newProjetFrame.getLocationTextArea().getText();
-      String image = "images";
-      String properties = "resources.properties";
       if (name != null && !name.isEmpty() && location != null && !location.isEmpty()) {
         currentFile = new File(location, name);
-        File imageDir = new File(currentFile, image);
-        File propertiesFile = new File(currentFile, properties);
-        if (!currentFile.exists()) {
-          currentFile.mkdirs(); // Create the directory if it doesn't exist
-        }
-        if (!imageDir.exists()) {
-          imageDir.mkdirs(); // Create the image directory if it doesn't exist
-        }
-        if (!propertiesFile.exists()) {
-          try {
-            propertiesFile.createNewFile(); // Create the properties file if it doesn't exist
-          } catch (IOException ex) {
-            ex.printStackTrace();
-          }
-        }
+        initProjectFolder(); // Initialize the project folder
         newProjetFrame.dispose();
-        initMain(); // Initialize the main frame
+        initMainFrame(); // Initialize the main frame
       } else {
         System.err.println("Name or location cannot be empty.");
       }
@@ -153,7 +160,7 @@ public class GUIController {
     });
   }
 
-  private void initMenuBarController(String imageDirectory) {
+  private void initMenuBarController() {
     JMenuItem newItem = mainFrame.getMenuItem(0, 0);
     if (newItem != null) {
       newItem.addActionListener(e -> {

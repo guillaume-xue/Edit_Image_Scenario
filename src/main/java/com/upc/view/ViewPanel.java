@@ -8,9 +8,9 @@ import java.util.ArrayList;
 public class ViewPanel extends JPanel {
 
   private JPanel mainPanel;
-  private JButton addButton;
+  private JButton importButton;
 
-  public ViewPanel(String path) {
+  public ViewPanel() {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Grid with 4 columns and spacing
     setPreferredSize(new Dimension(400, 400)); // Set preferred size for the panel
@@ -28,12 +28,12 @@ public class ViewPanel extends JPanel {
     buttonPanel.setPreferredSize(new Dimension(1200, 40)); // Set preferred size for the panel
     buttonPanel.setMaximumSize(new Dimension(1200, 40)); // Set maximum size for the panel
 
-    this.addButton = new JButton("Import");
-    addButton.setPreferredSize(new Dimension(100, 30));
-    addButton.setMaximumSize(new Dimension(100, 30));
-    addButton.setMinimumSize(new Dimension(100, 30));
+    this.importButton = new JButton("Import");
+    importButton.setPreferredSize(new Dimension(100, 30));
+    importButton.setMaximumSize(new Dimension(100, 30));
+    importButton.setMinimumSize(new Dimension(100, 30));
 
-    buttonPanel.add(addButton);
+    buttonPanel.add(importButton);
 
     add(buttonPanel);
     add(mainPanel);
@@ -50,8 +50,8 @@ public class ViewPanel extends JPanel {
     return labels;
   }
 
-  public JButton getAddButton() {
-    return addButton;
+  public JButton getImportButton() {
+    return importButton;
   }
 
   public JPanel getMainPanel() {

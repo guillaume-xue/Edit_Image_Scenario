@@ -7,33 +7,33 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-class ResizablePanel extends JPanel {
+public class ResizablePanel extends JPanel {
 
-  private JLabel duration;
+  private JLabel durationLabel;
   private JLabel iconLabel;
 
   public ResizablePanel() {
     setBackground(Color.WHITE);
     setPreferredSize(new Dimension(200, 100));
     setMinimumSize(new Dimension(150, 100));
-    duration = new JLabel();
+    durationLabel = new JLabel();
   }
 
-  public ResizablePanel(ImageIcon icon) {
+  public ResizablePanel(ImageIcon icon, int duration) {
     super();
-    setPreferredSize(new Dimension(200, 100));
+    setPreferredSize(new Dimension(duration, 100));
     iconLabel = new JLabel(icon);
-    duration = new JLabel(getPreferredSize().width + "");
-    add(duration);
+    durationLabel = new JLabel(duration + "");
+    add(durationLabel);
     add(iconLabel);
   }
 
   public void setDuration(String duration) {
-    this.duration.setText(duration);
+    this.durationLabel.setText(duration);
   }
 
   public int getDuration() {
-    return Integer.parseInt(duration.getText());
+    return Integer.parseInt(durationLabel.getText());
   }
 
   public ImageIcon getIcon() {

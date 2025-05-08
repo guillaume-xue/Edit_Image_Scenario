@@ -2,7 +2,6 @@ package com.upc.controller;
 
 import com.upc.model.ImageEditorModel;
 import com.upc.view.ImageEditPanel;
-import com.upc.view.ImageEditPanel.ClosableTabComponent;
 import com.upc.view.DrawingPanel;
 
 import javax.swing.*;
@@ -13,7 +12,6 @@ public class ImageEditor {
     private ImageEditPanel view;
     private JPopupMenu thicknessPopup;
     private int cpt = 0;
-
 
     public ImageEditor() {
         this.model = new ImageEditorModel();
@@ -58,7 +56,7 @@ public class ImageEditor {
         panel2.setController(controller2);
         view.addDrawingPanel("Dessin 1", panel1);
         view.addDrawingPanel("Dessin 2", panel2);
-        cpt+=2;
+        cpt += 2;
         initThicknessPopup();
 
     }
@@ -75,7 +73,7 @@ public class ImageEditor {
 
     private void initThicknessPopup() {
         thicknessPopup = new JPopupMenu();
-        JSlider thicknessSlider = new JSlider(0, 100, model.getStrokeWidth()+1); // Min: 1, Max: 20
+        JSlider thicknessSlider = new JSlider(0, 100, model.getStrokeWidth() + 1); // Min: 1, Max: 20
         thicknessSlider.setPaintTicks(true);
         thicknessSlider.setPaintLabels(true);
         thicknessSlider.setMajorTickSpacing(20);
@@ -121,6 +119,7 @@ public class ImageEditor {
                 break;
         }
     }
+
     private void showThicknessPopup(JButton button) {
         // Obtenir la position du bouton
         Point location = button.getLocationOnScreen();

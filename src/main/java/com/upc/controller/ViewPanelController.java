@@ -32,10 +32,36 @@ public class ViewPanelController {
     this.mouseController = mouseController;
     this.viewImage = new ViewImage();
     initActionListener(imageDirectory);
+    initViewPanel(imageDirectory);
+  }
+
+  public void initViewPanel(String imageDirectory) {
+    File directory = new File(imageDirectory);
+    if (directory.exists() && directory.isDirectory()) {
+      File[] files = directory.listFiles((dir, name) -> {
+        String lowerName = name.toLowerCase();
+        return lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".png") ||
+            lowerName.endsWith(".gif") || lowerName.endsWith(".bmp");
+      });
+      if (files != null && files.length > 0) {
+        for (File file : files) {
+          ImageIcon originalIcon = new ImageIcon(file.getAbsolutePath());
+          Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+          ImageIcon resizedIcon = new ImageIcon(resizedImage);
+          resizedIcon.setDescription(file.getAbsolutePath());
+          viewImage.addImageIcon(resizedIcon);
+        }
+        displayImages(viewImage.getImageIcons());
+      } else {
+        displayImages(null); // No images found
+      }
+    } else {
+      displayImages(null); // Directory does not exist or is not a directory
+    }
   }
 
   public void initActionListener(String imageDirectory) {
-    viewPanel.getAddButton().addActionListener(e -> {
+    viewPanel.getImportButton().addActionListener(e -> {
       JFileChooser fileChooser = new JFileChooser(); // Set default directory
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
           "Image Files", "jpg", "jpeg", "png", "gif", "bmp");
