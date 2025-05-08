@@ -1,5 +1,6 @@
 package com.upc.view;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -17,6 +18,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -39,25 +42,19 @@ public class TimeLinePanel extends JPanel {
 
         setTransferHandler(this.transferController.new TransferTimeLine(this));
 
-        JButton startButton = new JButton("start");
-        startButton.addActionListener(e -> startAnimation()); // Add ActionListener
-        this.add(startButton, BorderLayout.NORTH);
+        this.timeLinePanel = new JPanel();
+        timeLinePanel.setLayout(new BoxLayout(timeLinePanel, BoxLayout.X_AXIS));
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-
-        this.timeLinePanel = new JPanel();
-        timeLinePanel.setLayout(new BoxLayout(timeLinePanel, BoxLayout.X_AXIS));
+        scrollPane.setPreferredSize(new Dimension(800, 100));
+        scrollPane.setMinimumSize(new Dimension(800, 100));
         scrollPane.setViewportView(timeLinePanel);
 
         this.add(Box.createHorizontalStrut(40));
         this.add(scrollPane, BorderLayout.CENTER);
         this.add(Box.createHorizontalStrut(40));
-    }
-
-    private void startAnimation() {
-        animeViewPanel.animatePanel(getImageCopiesWithDurations());
     }
 
     public void addImageLabel(ImageIcon imageIcon) {

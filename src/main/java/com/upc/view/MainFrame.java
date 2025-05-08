@@ -13,23 +13,21 @@ import com.upc.controller.TransferController;
 import java.awt.BorderLayout;
 
 public class MainFrame extends JFrame {
-    private ViewPanel viewPanel;
     private TimeLinePanel timeLinePanel;
     private ImageEditPanel imageEditPanel;
     private AnimeViewPanel animeViewPanel;
 
     public MainFrame(ImageEditPanel imageEditPanel, TransferController transferController,
-            MouseController mouseController, String path) {
+            MouseController mouseController, ViewPanel viewPanel) {
         this.imageEditPanel = imageEditPanel;
         init();
         // Configurer le menu pour Mac
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         createMenuBar();
-        viewPanel = new ViewPanel(path, transferController, mouseController);
 
-        this.animeViewPanel = new AnimeViewPanel();
         timeLinePanel = new TimeLinePanel(transferController, mouseController, animeViewPanel);
+        this.animeViewPanel = new AnimeViewPanel(timeLinePanel);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(400);
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -98,10 +96,6 @@ public class MainFrame extends JFrame {
         }
 
         return menu.getItem(itemIndex);
-    }
-
-    public ViewPanel getViewPanel() {
-        return viewPanel;
     }
 
     public TimeLinePanel getTimeLinePanel() {
