@@ -51,4 +51,8 @@ public class AnimeViewPanel extends JPanel {
   public JButton getStartButton() {
     return startButton;
   }
+
+  public JPanel getAnimeViewPanel() {
+    return animeViewPanel;
+  }
 }

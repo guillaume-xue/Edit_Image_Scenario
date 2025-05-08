@@ -67,7 +67,7 @@ public class GUIController {
       this.timeLinePanelController = new TimeLinePanelController(timeLinePanel, transferController,
           mouseController);
       this.timeLinePanelController.initTimeLinePanel(scenarioFile, imageDir);
-      new AnimaViewPanelController(animeViewPanel, this.timeLinePanelController);
+      new AnimaViewPanelController(animeViewPanel, this.timeLinePanelController, imageDir);
       initMenuBarController();
     } catch (IOException ex) {
       ex.printStackTrace();

@@ -1,5 +1,6 @@
 package com.upc.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -13,10 +14,12 @@ public class AnimaViewPanelController {
 
   AnimeViewPanel animeViewPanel;
   TimeLinePanelController timeLinePanelController;
+  File imageDirectory;
 
-  AnimaViewPanelController(AnimeViewPanel animeViewPanel, TimeLinePanelController timeLinePanel) {
+  AnimaViewPanelController(AnimeViewPanel animeViewPanel, TimeLinePanelController timeLinePanel, File imageDirectory) {
     this.animeViewPanel = animeViewPanel;
     this.timeLinePanelController = timeLinePanel;
+    this.imageDirectory = imageDirectory;
     initialize();
   }
 
@@ -29,16 +32,17 @@ public class AnimaViewPanelController {
     new Thread(() -> {
       for (Map.Entry<ImageIcon, Integer> entry : imageWithDuration) {
         ImageIcon image = entry.getKey();
-        ImageIcon originalIcon = new ImageIcon(image.getDescription());
+        File imageFile = new File(imageDirectory, image.getDescription());
+        ImageIcon originalIcon = new ImageIcon(imageFile.getAbsolutePath());
 
         int duration = entry.getValue();
 
         JLabel label = new JLabel(originalIcon);
         label.setBounds(0, 0, originalIcon.getIconWidth(), originalIcon.getIconHeight());
         SwingUtilities.invokeLater(() -> {
-          animeViewPanel.removeAll();
-          animeViewPanel.add(label);
-          animeViewPanel.repaint();
+          animeViewPanel.getAnimeViewPanel().removeAll();
+          animeViewPanel.getAnimeViewPanel().add(label);
+          animeViewPanel.getAnimeViewPanel().repaint();
         });
 
         try {
@@ -48,7 +52,7 @@ public class AnimaViewPanelController {
           break;
         }
       }
-      SwingUtilities.invokeLater(animeViewPanel::removeAll);
+      SwingUtilities.invokeLater(animeViewPanel.getAnimeViewPanel()::removeAll);
     }).start();
   }
 
