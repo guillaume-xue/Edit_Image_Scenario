@@ -2,8 +2,10 @@ package com.upc.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 
@@ -24,6 +26,8 @@ public class GUIController {
 
   private TransferController transferController;
   private MouseController mouseController;
+  private TimeLinePanelController timeLinePanelController;
+
   private File currentFile;
   private File imageDir;
   private File propertiesFile;
@@ -60,9 +64,10 @@ public class GUIController {
       AnimeViewPanel animeViewPanel = new AnimeViewPanel();
       this.mainFrame = new MainFrame(imageEditor.getImageEditPanel(), viewPanel, timeLinePanel, animeViewPanel);
       new ViewPanelController(viewPanel, mainFrame, transferController, mouseController, imageDir.getAbsolutePath());
-      TimeLinePanelController timeLinePanelController = new TimeLinePanelController(timeLinePanel, transferController,
+      this.timeLinePanelController = new TimeLinePanelController(timeLinePanel, transferController,
           mouseController);
-      new AnimaViewPanelController(animeViewPanel, timeLinePanelController);
+      this.timeLinePanelController.initTimeLinePanel(scenarioFile, imageDir);
+      new AnimaViewPanelController(animeViewPanel, this.timeLinePanelController);
       initMenuBarController();
     } catch (IOException ex) {
       ex.printStackTrace();
@@ -160,6 +165,21 @@ public class GUIController {
     });
   }
 
+  private void saveScenarioFile() {
+    try (java.io.FileWriter writer = new java.io.FileWriter(scenarioFile)) {
+      for (Map.Entry<ImageIcon, Integer> entry : timeLinePanelController.getImageCopiesWithDurations()) {
+        ImageIcon image = entry.getKey();
+        String imageName = image.getDescription();
+        int duration = entry.getValue();
+
+        writer.write(imageName + " ," + duration + System.lineSeparator());
+      }
+      System.out.println("Scenario file saved successfully.");
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+  }
+
   private void initMenuBarController() {
     JMenuItem newItem = mainFrame.getMenuItem(0, 0);
     if (newItem != null) {
@@ -178,7 +198,9 @@ public class GUIController {
 
     JMenuItem saveItem = mainFrame.getMenuItem(0, 2);
     if (saveItem != null) {
-      saveItem.addActionListener(e -> MenuBarController.saveFile());
+      saveItem.addActionListener(e -> {
+        saveScenarioFile();
+      });
     }
 
     JMenuItem exitItem = mainFrame.getMenuItem(0, 3);

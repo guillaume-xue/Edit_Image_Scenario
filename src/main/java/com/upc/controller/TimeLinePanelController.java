@@ -1,5 +1,7 @@
 package com.upc.controller;
 
+import java.awt.Image;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -19,8 +21,32 @@ public class TimeLinePanelController {
     this.timeLinePanel.setTransferHandler(transferController.new TransferTimeLine(timeLinePanel));
   }
 
-  public void initTimeLinePanel() {
+  public void initTimeLinePanel(File scenario, File imageDirectory) {
+    if (scenario == null || !scenario.exists()) {
+      return; // Scenario file does not exist
+    }
+    String scenarioContent;
+    try {
+      scenarioContent = new String(java.nio.file.Files.readAllBytes(scenario.toPath()));
+    } catch (java.io.IOException e) {
+      e.printStackTrace();
+      return; // Exit if the file cannot be read
+    }
+    String[] lines = scenarioContent.split("\n");
+    for (String line : lines) {
+      String[] parts = line.split(",");
+      if (parts.length == 2) {
 
+        String imageName = parts[0].trim();
+        File imageFile = new File(imageDirectory, imageName);
+        int duration = Integer.parseInt(parts[1].trim());
+
+        ImageIcon icon = new ImageIcon(imageFile.getAbsolutePath());
+        ImageIcon resizedIcon = new ImageIcon(icon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH));
+        resizedIcon.setDescription(imageName);
+        timeLinePanel.addImageLabel(resizedIcon, duration);
+      }
+    }
   }
 
   public ArrayList<Map.Entry<ImageIcon, Integer>> getImageCopiesWithDurations() {

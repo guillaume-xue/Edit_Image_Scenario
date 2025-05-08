@@ -48,7 +48,7 @@ public class ViewPanelController {
           ImageIcon originalIcon = new ImageIcon(file.getAbsolutePath());
           Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
           ImageIcon resizedIcon = new ImageIcon(resizedImage);
-          resizedIcon.setDescription(file.getAbsolutePath());
+          resizedIcon.setDescription(file.getName());
           viewImage.addImageIcon(resizedIcon);
         }
         displayImages(viewImage.getImageIcons());
@@ -76,7 +76,7 @@ public class ViewPanelController {
           ImageIcon originalIcon = new ImageIcon(selectedFile.getAbsolutePath());
           Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
           ImageIcon resizedIcon = new ImageIcon(resizedImage);
-          resizedIcon.setDescription(selectedFile.getAbsolutePath());
+          resizedIcon.setDescription(destinationFile.getName());
           viewImage.addImageIcon(resizedIcon);
           displayImages(viewImage.getImageIcons()); // Refresh the view panel
         } catch (IOException ex) {
