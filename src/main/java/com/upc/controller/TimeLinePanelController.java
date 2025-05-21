@@ -92,9 +92,6 @@ public class TimeLinePanelController {
       // Suppression dans l'affichage
       timeLinePanel.getTimeLinePanel().remove(divider);
       timeLinePanel.getTimeLinePanel().remove(divider.getLeft());
-      if (divider.getPrecDividerPanel() == null) {
-        timeLinePanel.getTimeLinePanel().remove(divider.getRight());
-      }
       // Mise à jour de la chaîne
       return divider.getPrecDividerPanel();
     } else {

@@ -45,7 +45,9 @@ public class DividerPanel extends JPanel {
         left.setPreferredSize(new Dimension(newLeft, left.getHeight()));
         left.setDuration(newLeft + "");
         right.setPreferredSize(new Dimension(newRight, right.getHeight()));
-        right.setDuration(newRight + "");
+        if (right.getDuration() != 0) {
+          right.setDuration(newRight + "");
+        }
         left.revalidate();
         right.revalidate();
         DividerPanel.this.getParent().revalidate();

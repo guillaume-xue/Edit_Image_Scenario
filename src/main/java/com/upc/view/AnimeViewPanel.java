@@ -26,7 +26,6 @@ public class AnimeViewPanel extends JPanel {
 
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-    buttonPanel.setBackground(Color.BLUE);
     buttonPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
     File startIcon = new File("src/main/resources/Icon/startIcon.png");
     File breakIcon = new File("src/main/resources/Icon/breakIcon.png");

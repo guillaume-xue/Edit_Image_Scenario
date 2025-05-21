@@ -6,9 +6,11 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.upc.view.AnimeViewPanel;
+import com.upc.view.DisplayAnimePanel;
 
 public class AnimaViewPanelController {
 
@@ -37,11 +39,13 @@ public class AnimaViewPanelController {
 
         int duration = entry.getValue();
 
-        JLabel label = new JLabel(originalIcon);
-        label.setBounds(0, 0, originalIcon.getIconWidth(), originalIcon.getIconHeight());
+        JPanel imagePanel = new DisplayAnimePanel(originalIcon);
+        imagePanel.setPreferredSize(animeViewPanel.getAnimeViewPanel().getSize());
+
         SwingUtilities.invokeLater(() -> {
           animeViewPanel.getAnimeViewPanel().removeAll();
-          animeViewPanel.getAnimeViewPanel().add(label);
+          animeViewPanel.getAnimeViewPanel().add(imagePanel);
+          animeViewPanel.getAnimeViewPanel().revalidate();
           animeViewPanel.getAnimeViewPanel().repaint();
         });
 
