@@ -76,33 +76,30 @@ public class TimeLinePanelController {
   }
 
   public void removeImageLabel(ResizablePanel resizablePanel) {
-    DividerPanel tmp = currentDividerPanel;
-    while (tmp != null) {
-      if (tmp.getLeft() == resizablePanel) {
-        // Remove the ResizablePanel and adjust DividerPanel
-        ResizablePanel right = tmp.getRight();
-        DividerPanel prec = tmp.getPrecDividerPanel();
+    currentDividerPanel = removeImageLabelRecursive(currentDividerPanel, resizablePanel);
+    if (currentDividerPanel == null) {
+      timeLinePanel.getTimeLinePanel().removeAll();
+    }
+    timeLinePanel.getTimeLinePanel().revalidate();
+    timeLinePanel.getTimeLinePanel().repaint();
+  }
 
-        // Remove the current DividerPanel and ResizablePanel
-        timeLinePanel.getTimeLinePanel().remove(tmp);
-        timeLinePanel.getTimeLinePanel().remove(resizablePanel);
-
-        if (prec != null) {
-          // Update the previous DividerPanel to connect to the right panel
-          prec.setRight(right);
-        }
-
-        // Update the currentDividerPanel if necessary
-        if (tmp == currentDividerPanel) {
-          currentDividerPanel = prec;
-        }
-
-        // Refresh the layout
-        timeLinePanel.getTimeLinePanel().revalidate();
-        timeLinePanel.getTimeLinePanel().repaint();
-        return;
+  private DividerPanel removeImageLabelRecursive(DividerPanel divider, ResizablePanel resizablePanel) {
+    if (divider == null) {
+      return null;
+    }
+    if (divider.getLeft() == resizablePanel) {
+      // Suppression dans l'affichage
+      timeLinePanel.getTimeLinePanel().remove(divider);
+      timeLinePanel.getTimeLinePanel().remove(divider.getLeft());
+      if (divider.getPrecDividerPanel() == null) {
+        timeLinePanel.getTimeLinePanel().remove(divider.getRight());
       }
-      tmp = tmp.getPrecDividerPanel();
+      // Mise à jour de la chaîne
+      return divider.getPrecDividerPanel();
+    } else {
+      divider.setPrecDividerPanel(removeImageLabelRecursive(divider.getPrecDividerPanel(), resizablePanel));
+      return divider;
     }
   }
 
