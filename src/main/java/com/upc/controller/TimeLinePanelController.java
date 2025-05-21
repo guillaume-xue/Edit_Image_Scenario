@@ -1,5 +1,6 @@
 package com.upc.controller;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
 import java.util.ArrayList;
@@ -54,6 +55,11 @@ public class TimeLinePanelController {
 
   public void addImageLabel(ImageIcon imageIcon, int duration) {
     ResizablePanel resizablePanel = new ResizablePanel(imageIcon, duration);
+    int width = duration;
+    int height = 100;
+    resizablePanel.setPreferredSize(new Dimension(width, height));
+    resizablePanel.setMinimumSize(new Dimension(width, height));
+    resizablePanel.setMaximumSize(new Dimension(width, height));
     resizablePanel.addMouseListener(mouseController.new TimeLinePanelMouseController(resizablePanel, this));
     ResizablePanel emptyPanel = new ResizablePanel();
     timeLinePanel.getTimeLinePanel().add(resizablePanel);
@@ -104,7 +110,6 @@ public class TimeLinePanelController {
     ArrayList<Map.Entry<ImageIcon, Integer>> imageCopiesWithDurations = new ArrayList<>();
     DividerPanel tmp = currentDividerPanel;
     while (tmp != null) {
-      System.out.println("test");
       ResizablePanel left = tmp.getLeft();
       if (left != null && left.getIcon() != null) {
         imageCopiesWithDurations.add(Map.entry(left.getIcon(), left.getDuration()));

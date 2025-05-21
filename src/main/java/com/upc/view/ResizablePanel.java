@@ -14,8 +14,8 @@ public class ResizablePanel extends JPanel {
 
   public ResizablePanel() {
     setBackground(Color.WHITE);
-    setPreferredSize(new Dimension(200, 100));
-    setMinimumSize(new Dimension(150, 100));
+    setPreferredSize(new Dimension(100, 100));
+    setMinimumSize(new Dimension(100, 100));
     durationLabel = new JLabel();
   }
 

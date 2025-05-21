@@ -23,9 +23,9 @@ public class DividerPanel extends JPanel {
     this.left = left;
     this.right = right;
     this.precDividerPanel = prec;
-    setPreferredSize(new Dimension(5, 80));
-    setMinimumSize(new Dimension(5, 80));
-    setMaximumSize(new Dimension(5, 80));
+    setPreferredSize(new Dimension(5, 100));
+    setMinimumSize(new Dimension(5, 100));
+    setMaximumSize(new Dimension(5, 100));
     setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
     setBackground(Color.DARK_GRAY);
 
