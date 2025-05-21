@@ -144,12 +144,13 @@ public class GUIController {
       int returnValue = fileChooser.showOpenDialog(newProjetFrame);
       if (returnValue == JFileChooser.APPROVE_OPTION) {
         File selectedDirectory = fileChooser.getSelectedFile();
-        newProjetFrame.getLocationTextArea().setText(selectedDirectory.getAbsolutePath());
+        if (selectedDirectory != null) {
+          newProjetFrame.getLocationTextArea().setText(selectedDirectory.getAbsolutePath());
+          String name = newProjetFrame.getNameTextArea().getText();
+          String location = newProjetFrame.getLocationTextArea().getText();
+          newProjetFrame.getDirectoryLabel().setText(location + "/" + name);
+        }
       }
-      newProjetFrame.getLocationTextArea().setText(fileChooser.getSelectedFile().getAbsolutePath());
-      String name = newProjetFrame.getNameTextArea().getText();
-      String location = newProjetFrame.getLocationTextArea().getText();
-      newProjetFrame.getDirectoryLabel().setText(location + "/" + name);
       newProjetFrame.repaint();
       newProjetFrame.revalidate();
     });
