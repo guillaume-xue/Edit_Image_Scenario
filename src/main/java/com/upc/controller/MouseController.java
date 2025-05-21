@@ -2,8 +2,7 @@ package com.upc.controller;
 
 import javax.swing.*;
 
-import com.upc.view.TimeLinePanel;
-
+import com.upc.view.ResizablePanel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -11,20 +10,19 @@ public class MouseController {
 
   public class TimeLinePanelMouseController extends MouseAdapter {
 
-    private Box verticalBox;
-    private TimeLinePanel timeLinePanel;
+    ResizablePanel resizablePanel;
+    TimeLinePanelController timeLinePanelController;
 
-    public TimeLinePanelMouseController(Box verticalBox, TimeLinePanel timeLinePanel) {
-      this.verticalBox = verticalBox;
-      this.timeLinePanel = timeLinePanel;
+    public TimeLinePanelMouseController(ResizablePanel resizablePanel,
+        TimeLinePanelController timeLinePanelController) {
+      this.resizablePanel = resizablePanel;
+      this.timeLinePanelController = timeLinePanelController;
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
       if (e.getClickCount() == 2) { // Double-click detected
-        timeLinePanel.remove(verticalBox);
-        timeLinePanel.revalidate(); // Refresh layout
-        timeLinePanel.repaint(); // Repaint the panel
+        timeLinePanelController.removeImageLabel(resizablePanel);
       }
     }
   }

@@ -166,6 +166,9 @@ public class GUIController {
   }
 
   private void saveScenarioFile() {
+    if (scenarioFile.exists()) {
+      scenarioFile.delete(); // Delete the existing file to allow overwriting
+    }
     try (java.io.FileWriter writer = new java.io.FileWriter(scenarioFile)) {
       for (Map.Entry<ImageIcon, Integer> entry : timeLinePanelController.getImageCopiesWithDurations()) {
         ImageIcon image = entry.getKey();

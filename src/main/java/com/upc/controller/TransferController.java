@@ -2,8 +2,6 @@ package com.upc.controller;
 
 import javax.swing.*;
 
-import com.upc.view.TimeLinePanel;
-
 import java.awt.*;
 import java.awt.datatransfer.*;
 
@@ -11,9 +9,9 @@ public class TransferController {
 
   public class TransferTimeLine extends TransferHandler {
 
-    private TimeLinePanel timeLinePanel;
+    private TimeLinePanelController timeLinePanel;
 
-    public TransferTimeLine(TimeLinePanel timeLinePanel) {
+    public TransferTimeLine(TimeLinePanelController timeLinePanel) {
       this.timeLinePanel = timeLinePanel;
     }
 

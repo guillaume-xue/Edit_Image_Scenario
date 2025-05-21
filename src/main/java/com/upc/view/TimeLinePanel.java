@@ -2,7 +2,6 @@ package com.upc.view;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -12,7 +11,6 @@ import java.awt.Dimension;
 
 public class TimeLinePanel extends JPanel {
     private JPanel timeLinePanel;
-    private DividerPanel currentDividerPanel = null;
 
     public TimeLinePanel() {
         super();
@@ -34,23 +32,7 @@ public class TimeLinePanel extends JPanel {
         this.add(Box.createHorizontalStrut(40));
     }
 
-    public void addImageLabel(ImageIcon imageIcon, int duration) {
-        ResizablePanel resizablePanel = new ResizablePanel(imageIcon, duration);
-        ResizablePanel emptyPanel = new ResizablePanel();
-        timeLinePanel.add(resizablePanel);
-        if (currentDividerPanel != null) {
-            timeLinePanel.remove(timeLinePanel.getComponentCount() - 2);
-            currentDividerPanel = new DividerPanel(currentDividerPanel, resizablePanel, emptyPanel);
-        } else {
-            currentDividerPanel = new DividerPanel(null, resizablePanel, emptyPanel);
-        }
-        timeLinePanel.add(currentDividerPanel);
-        timeLinePanel.add(emptyPanel);
-        timeLinePanel.revalidate(); // Refresh layout
-        timeLinePanel.repaint(); // Repaint the panel
-    }
-
-    public DividerPanel getCurrentDividerPanel() {
-        return currentDividerPanel;
+    public JPanel getTimeLinePanel() {
+        return timeLinePanel;
     }
 }
