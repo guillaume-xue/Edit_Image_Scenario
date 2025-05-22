@@ -2,6 +2,8 @@ package com.upc.controller;
 
 import javax.swing.*;
 
+import com.upc.view.ImageViewPanel;
+
 import java.awt.*;
 import java.awt.datatransfer.*;
 
@@ -43,8 +45,8 @@ public class TransferController {
   public class TransferViewPanel extends TransferHandler {
     @Override
     protected Transferable createTransferable(JComponent c) {
-      JLabel label = (JLabel) c;
-      ImageIcon icon = (ImageIcon) label.getIcon();
+      ImageViewPanel panel = (ImageViewPanel) c;
+      ImageIcon icon = panel.getImageIcon();
       return new ImageIconTransferable(icon);
     }
 
@@ -60,21 +62,6 @@ public class TransferController {
 
     @Override
     public boolean importData(TransferSupport support) {
-      if (!canImport(support)) {
-        return false;
-      }
-
-      try {
-        Image image = (Image) support.getTransferable().getTransferData(DataFlavor.imageFlavor);
-        String description = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
-        ImageIcon imageIcon = new ImageIcon(image);
-        imageIcon.setDescription(description);
-        JLabel label = (JLabel) support.getComponent();
-        label.setIcon(imageIcon);
-        return true;
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
       return false;
     }
   }

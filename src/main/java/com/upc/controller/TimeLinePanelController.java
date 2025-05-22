@@ -46,11 +46,12 @@ public class TimeLinePanelController {
         int duration = Integer.parseInt(parts[1].trim());
 
         ImageIcon icon = new ImageIcon(imageFile.getAbsolutePath());
-        ImageIcon resizedIcon = new ImageIcon(icon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH));
-        resizedIcon.setDescription(imageName);
-        addImageLabel(resizedIcon, duration);
+        icon.setDescription(imageName);
+        addImageLabel(icon, duration);
       }
     }
+    timeLinePanel.getTimeLinePanel().revalidate();
+    timeLinePanel.getTimeLinePanel().repaint();
   }
 
   public void addImageLabel(ImageIcon imageIcon, int duration) {

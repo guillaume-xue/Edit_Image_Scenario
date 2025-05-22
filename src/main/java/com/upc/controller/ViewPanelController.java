@@ -1,25 +1,22 @@
 package com.upc.controller;
 
-import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.upc.model.ViewImage;
+import com.upc.view.ImageViewPanel;
 import com.upc.view.MainFrame;
 import com.upc.view.ViewPanel;
 
 public class ViewPanelController {
 
   private ViewPanel viewPanel;
-  private ViewImage viewImage;
   private MainFrame mainFrame;
   private TransferController transferController;
   private MouseController mouseController;
@@ -30,13 +27,13 @@ public class ViewPanelController {
     this.mainFrame = mainFrame;
     this.transferController = transferController;
     this.mouseController = mouseController;
-    this.viewImage = new ViewImage();
     initActionListener(imageDirectory);
     initViewPanel(imageDirectory);
   }
 
   public void initViewPanel(String imageDirectory) {
     File directory = new File(imageDirectory);
+    viewPanel.getMainPanel().add(Box.createHorizontalStrut(10));
     if (directory.exists() && directory.isDirectory()) {
       File[] files = directory.listFiles((dir, name) -> {
         String lowerName = name.toLowerCase();
@@ -46,18 +43,17 @@ public class ViewPanelController {
       if (files != null && files.length > 0) {
         for (File file : files) {
           ImageIcon originalIcon = new ImageIcon(file.getAbsolutePath());
-          Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-          ImageIcon resizedIcon = new ImageIcon(resizedImage);
-          resizedIcon.setDescription(file.getName());
-          viewImage.addImageIcon(resizedIcon);
+          originalIcon.setDescription(file.getName());
+          ImageViewPanel viewImage = new ImageViewPanel(originalIcon);
+          viewImage.setTransferHandler(transferController.new TransferViewPanel()); // Enable drag functionality
+          viewImage.addMouseListener(mouseController.new ViewPanelMouseController());
+          viewPanel.getMainPanel().add(viewImage);
+          viewPanel.getMainPanel().add(Box.createHorizontalStrut(10)); // Add space between images
         }
-        displayImages(viewImage.getImageIcons());
-      } else {
-        displayImages(null); // No images found
       }
-    } else {
-      displayImages(null); // Directory does not exist or is not a directory
     }
+    viewPanel.getMainPanel().revalidate();
+    viewPanel.getMainPanel().repaint();
   }
 
   public void initActionListener(String imageDirectory) {
@@ -73,34 +69,19 @@ public class ViewPanelController {
         File destinationFile = new File(destinationDir, selectedFile.getName());
         try {
           Files.copy(selectedFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-          ImageIcon originalIcon = new ImageIcon(selectedFile.getAbsolutePath());
-          Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-          ImageIcon resizedIcon = new ImageIcon(resizedImage);
-          resizedIcon.setDescription(destinationFile.getName());
-          viewImage.addImageIcon(resizedIcon);
-          displayImages(viewImage.getImageIcons()); // Refresh the view panel
+          ImageIcon icon = new ImageIcon(selectedFile.getAbsolutePath());
+          icon.setDescription(destinationFile.getName());
+          ImageViewPanel viewImage = new ImageViewPanel(icon);
+          viewImage.setTransferHandler(transferController.new TransferViewPanel()); // Enable drag functionality
+          viewImage.addMouseListener(mouseController.new ViewPanelMouseController());
+          viewPanel.getMainPanel().add(viewImage);
+          viewPanel.getMainPanel().add(Box.createHorizontalStrut(10)); // Add space between images
+          viewPanel.getMainPanel().revalidate();
+          viewPanel.getMainPanel().repaint();
         } catch (IOException ex) {
           ex.printStackTrace();
         }
       }
     });
-  }
-
-  public void displayImages(ArrayList<ImageIcon> imageIcons) {
-    // Clear existing components
-    viewPanel.getMainPanel().removeAll();
-    if (imageIcons != null && !imageIcons.isEmpty()) {
-      for (ImageIcon imageIcon : imageIcons) {
-        JLabel imageLabel = new JLabel(imageIcon);
-        imageLabel.setTransferHandler(transferController.new TransferViewPanel()); // Enable drag functionality
-        imageLabel.addMouseListener(mouseController.new ViewPanelMouseController());
-        viewPanel.getMainPanel().add(imageLabel);
-      }
-    } else {
-      JLabel noImagesLabel = new JLabel("No images found in /resources/image");
-      viewPanel.getMainPanel().add(noImagesLabel);
-    }
-    viewPanel.getMainPanel().revalidate(); // Refresh layout
-    viewPanel.getMainPanel().repaint(); // Repaint the panel
   }
 }
