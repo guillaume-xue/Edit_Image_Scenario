@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 import com.upc.view.DividerPanel;
 import com.upc.view.ResizablePanel;
@@ -17,11 +20,13 @@ public class TimeLinePanelController {
   private TimeLinePanel timeLinePanel;
   private DividerPanel currentDividerPanel = null;
   private MouseController mouseController;
+  private JDialog loadingDialog;
 
   public TimeLinePanelController(TimeLinePanel timeLinePanel, TransferController transferController,
-      MouseController mouseController) {
+      MouseController mouseController, JDialog loadingDialog) {
     this.timeLinePanel = timeLinePanel;
     this.mouseController = mouseController;
+    this.loadingDialog = loadingDialog;
     this.timeLinePanel.setTransferHandler(transferController.new TransferTimeLine(this));
   }
 
@@ -29,29 +34,70 @@ public class TimeLinePanelController {
     if (scenario == null || !scenario.exists()) {
       return; // Scenario file does not exist
     }
-    String scenarioContent;
-    try {
-      scenarioContent = new String(java.nio.file.Files.readAllBytes(scenario.toPath()));
-    } catch (java.io.IOException e) {
-      e.printStackTrace();
-      return; // Exit if the file cannot be read
-    }
-    String[] lines = scenarioContent.split("\n");
-    for (String line : lines) {
-      String[] parts = line.split(",");
-      if (parts.length == 2) {
 
-        String imageName = parts[0].trim();
-        File imageFile = new File(imageDirectory, imageName);
-        int duration = Integer.parseInt(parts[1].trim());
+    new SwingWorker<Void, Object[]>() {
+      @Override
+      protected Void doInBackground() {
+        String scenarioContent;
+        try {
+          scenarioContent = new String(java.nio.file.Files.readAllBytes(scenario.toPath()));
+        } catch (java.io.IOException e) {
+          e.printStackTrace();
+          return null; // Exit if the file cannot be read
+        }
+        String[] lines = scenarioContent.split("\n");
+        for (String line : lines) {
+          String[] parts = line.split(",");
+          if (parts.length == 2) {
+            String imageName = parts[0].trim();
+            File imageFile = new File(imageDirectory, imageName);
+            if (!imageFile.exists()) {
+              // Publier l'erreur pour affichage dans l'EDT
+              publish(new Object[] { "error", imageFile.getAbsolutePath() });
+              continue;
+            }
+            int duration = Integer.parseInt(parts[1].trim());
 
-        ImageIcon icon = new ImageIcon(imageFile.getAbsolutePath());
-        icon.setDescription(imageName);
-        addImageLabel(icon, duration);
+            // Charge et redimensionne l'image
+            ImageIcon tempIcon = new ImageIcon(imageFile.getAbsolutePath());
+            int maxW = 120, maxH = 80;
+            int iw = tempIcon.getIconWidth(), ih = tempIcon.getIconHeight();
+            double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
+            int w = (int) (iw * ratio), h = (int) (ih * ratio);
+            Image scaled = tempIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            ImageIcon scaledIcon = new ImageIcon(scaled);
+            scaledIcon.setDescription(imageName);
+
+            // Publier l'image et la durée pour ajout dans l'EDT
+            publish(new Object[] { "image", scaledIcon, duration });
+          }
+        }
+        return null;
       }
-    }
-    timeLinePanel.getTimeLinePanel().revalidate();
-    timeLinePanel.getTimeLinePanel().repaint();
+
+      @Override
+      protected void process(java.util.List<Object[]> chunks) {
+        for (Object[] obj : chunks) {
+          if ("error".equals(obj[0])) {
+            String path = (String) obj[1];
+            System.err.println("Image file not found: " + path);
+          } else if ("image".equals(obj[0])) {
+            ImageIcon scaledIcon = (ImageIcon) obj[1];
+            int duration = (int) obj[2];
+            addImageLabel(scaledIcon, duration);
+          }
+        }
+        timeLinePanel.getTimeLinePanel().revalidate();
+        timeLinePanel.getTimeLinePanel().repaint();
+      }
+
+      @Override
+      protected void done() {
+        if (loadingDialog != null && loadingDialog.isVisible()) {
+          loadingDialog.dispose();
+        }
+      }
+    }.execute();
   }
 
   public void addImageLabel(ImageIcon imageIcon, int duration) {

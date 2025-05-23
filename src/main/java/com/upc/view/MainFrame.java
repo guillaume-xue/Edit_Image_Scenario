@@ -8,6 +8,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 public class MainFrame extends JFrame {
 
@@ -43,6 +44,7 @@ public class MainFrame extends JFrame {
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         this.setLayout(new BorderLayout());
+        this.setMinimumSize(new Dimension(800, 700));
     }
 
     private void createMenuBar() {

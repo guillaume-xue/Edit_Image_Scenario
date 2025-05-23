@@ -6,8 +6,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import com.upc.view.AnimeViewPanel;
 import com.upc.view.MainFrame;
@@ -27,6 +31,7 @@ public class GUIController {
   private TransferController transferController;
   private MouseController mouseController;
   private TimeLinePanelController timeLinePanelController;
+  private ViewPanelController viewPanelController;
 
   private File currentFile;
   private File imageDir;
@@ -53,7 +58,20 @@ public class GUIController {
   private void initMainFrame() {
     Properties properties = new Properties();
 
-    // Charger le fichier .properties
+    // Créer le dialog de chargement
+    JDialog loadingDialog = new JDialog();
+    loadingDialog.setModal(true);
+    loadingDialog.setTitle("Chargement");
+    loadingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // Empêche la fermeture
+    loadingDialog.setAlwaysOnTop(true); // Toujours au premier plan
+    loadingDialog.getContentPane().add(new JLabel("En cours de chargement...", SwingConstants.CENTER));
+    loadingDialog.setSize(300, 100);
+    loadingDialog.setLocationRelativeTo(null);
+    loadingDialog.setFocusableWindowState(false);
+
+    // Afficher le dialog dans un thread séparé pour ne pas bloquer l'EDT
+    SwingUtilities.invokeLater(() -> loadingDialog.setVisible(true));
+
     try {
       properties.load(getClass().getResourceAsStream("/resources.properties"));
       this.transferController = new TransferController();
@@ -63,14 +81,17 @@ public class GUIController {
       TimeLinePanel timeLinePanel = new TimeLinePanel();
       AnimeViewPanel animeViewPanel = new AnimeViewPanel();
       this.mainFrame = new MainFrame(imageEditor.getImageEditPanel(), viewPanel, timeLinePanel, animeViewPanel);
-      new ViewPanelController(viewPanel, mainFrame, transferController, mouseController, imageDir.getAbsolutePath());
+      this.viewPanelController = new ViewPanelController(viewPanel, mainFrame, transferController, mouseController,
+          imageDir.getAbsolutePath(), loadingDialog);
       this.timeLinePanelController = new TimeLinePanelController(timeLinePanel, transferController,
-          mouseController);
+          mouseController, loadingDialog);
+      this.viewPanelController.initViewPanel(imageDir.getAbsolutePath());
       this.timeLinePanelController.initTimeLinePanel(scenarioFile, imageDir);
       new AnimaViewPanelController(animeViewPanel, this.timeLinePanelController, imageDir);
       initMenuBarController();
     } catch (IOException ex) {
       ex.printStackTrace();
+      loadingDialog.dispose();
     }
   }
 

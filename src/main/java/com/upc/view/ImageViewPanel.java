@@ -12,6 +12,8 @@ public class ImageViewPanel extends JPanel {
     this.setPreferredSize(new Dimension(120, 80)); // Set preferred size for the panel
     this.setMinimumSize(new Dimension(120, 80)); // Set minimum size for the panel
     this.setMaximumSize(new Dimension(120, 80)); // Set maximum size for the panel
+    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Set layout manager
+    this.add(Box.createHorizontalStrut(10));
     setOpaque(false);
   }
 
