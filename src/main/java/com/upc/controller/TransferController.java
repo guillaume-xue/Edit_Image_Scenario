@@ -41,6 +41,38 @@ public class TransferController {
     }
   }
 
+  public class TransferDrawing extends TransferHandler {
+
+    private DrawingController drawingController;
+
+    public TransferDrawing(DrawingController drawingController) {
+      this.drawingController = drawingController;
+    }
+
+    @Override
+    public boolean canImport(TransferSupport support) {
+      return support.isDataFlavorSupported(DataFlavor.imageFlavor);
+    }
+
+    @Override
+    public boolean importData(TransferSupport support) {
+      if (!canImport(support)) {
+        return false;
+      }
+      try {
+        ImageIcon imageIcon = new ImageIcon(
+            (Image) support.getTransferable().getTransferData(DataFlavor.imageFlavor));
+        String description = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
+        imageIcon.setDescription(description);
+        drawingController.draw(imageIcon);
+        return true;
+      } catch (UnsupportedFlavorException | java.io.IOException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+  }
+
   // Classe pour gérer le transfert d'images
   public class TransferViewPanel extends TransferHandler {
     @Override

@@ -6,16 +6,29 @@ import com.upc.view.DrawingPanel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
+
+import javax.swing.ImageIcon;
 
 public class DrawingController implements MouseListener, MouseMotionListener {
     private int ox, oy;
     private DrawingPanel view;
     private ImageEditorModel model;
+    private File imageDir;
 
-    public DrawingController(DrawingPanel view, ImageEditorModel model) {
+    public DrawingController(DrawingPanel view, ImageEditorModel model, TransferController transferController,
+            File imageDir) {
         this.view = view;
         this.model = model;
+        this.imageDir = imageDir;
         this.view.initializeCanvas();
+        this.view.setTransferHandler(transferController.new TransferDrawing(this));
+    }
+
+    public void draw(ImageIcon image) {
+        File imageFile = new File(imageDir, image.getDescription());
+        ImageIcon originalIcon = new ImageIcon(imageFile.getAbsolutePath());
+        view.drawImageIcon(originalIcon);
     }
 
     @Override

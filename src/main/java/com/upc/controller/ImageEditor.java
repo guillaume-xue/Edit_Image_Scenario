@@ -6,16 +6,21 @@ import com.upc.view.DrawingPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class ImageEditor {
     private ImageEditorModel model;
     private ImageEditPanel view;
     private JPopupMenu thicknessPopup;
+    private TransferController transferController;
+    private File imageDir;
     private int cpt = 0;
 
-    public ImageEditor() {
+    public ImageEditor(TransferController transferController, File imageDir) {
         this.model = new ImageEditorModel();
         this.view = new ImageEditPanel();
+        this.imageDir = imageDir;
+        this.transferController = transferController;
         initView();
         initController();
     }
@@ -86,8 +91,8 @@ public class ImageEditor {
         DrawingPanel panel2 = new DrawingPanel();
 
         // Configurer les contrôleurs après la création des panneaux
-        DrawingController controller1 = new DrawingController(panel1, model);
-        DrawingController controller2 = new DrawingController(panel2, model);
+        DrawingController controller1 = new DrawingController(panel1, model, transferController, imageDir);
+        DrawingController controller2 = new DrawingController(panel2, model, transferController, imageDir);
 
         panel1.setController(controller1); // Associez le contrôleur au panneau
         panel2.setController(controller2);
@@ -151,7 +156,7 @@ public class ImageEditor {
                 break;
             case "+":
                 DrawingPanel newPanel = new DrawingPanel();
-                DrawingController newController = new DrawingController(newPanel, model);
+                DrawingController newController = new DrawingController(newPanel, model, transferController, imageDir);
                 newPanel.setController(newController);
                 view.addDrawingPanel("Dessin " + (++cpt), newPanel);
                 break;

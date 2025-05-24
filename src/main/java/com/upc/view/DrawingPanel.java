@@ -51,13 +51,13 @@ public class DrawingPanel extends JPanel {
         if (bi != null) {
             g.drawImage(bi, 0, 0, null);
         }
-    
+
         // Dessiner la forme temporaire si en mode prévisualisation
         if (isPreviewing) {
             Graphics2D g2d = (Graphics2D) g; // Convertir en Graphics2D pour gérer l'épaisseur
             g2d.setColor(previewColor); // Couleur de la prévisualisation
             g2d.setStroke(new BasicStroke(previewStrokeWidth)); // Appliquer l'épaisseur
-    
+
             switch (previewShape) {
                 case "Cercle":
                     g2d.drawOval(previewX, previewY, previewWidth, previewHeight);
@@ -80,7 +80,17 @@ public class DrawingPanel extends JPanel {
         gi.drawOval(x, y, width, height);
         repaint();
     }
-    
+
+    public void drawImageIcon(ImageIcon imageIcon) {
+        if (imageIcon != null) {
+            Image image = imageIcon.getImage();
+            int width = imageIcon.getIconWidth();
+            int height = imageIcon.getIconHeight();
+            gi.drawImage(image, 0, 0, width, height, null);
+            repaint();
+        }
+    }
+
     public void drawRect(int x, int y, int width, int height, Color color, int strokeWidth) {
         gi.setStroke(new BasicStroke(strokeWidth));
         gi.setColor(color);
@@ -94,7 +104,7 @@ public class DrawingPanel extends JPanel {
         this.previewY = y;
         this.previewWidth = width;
         this.previewHeight = height;
-        this.previewStrokeWidth = strokeWidth; 
+        this.previewStrokeWidth = strokeWidth;
         this.previewColor = color;
         this.isPreviewing = true;
         repaint();

@@ -3,7 +3,9 @@ package com.upc.view;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
 
@@ -21,6 +23,9 @@ public class AnimeViewPanel extends JPanel {
     JPanel topPanel = new JPanel();
     topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
     topPanel.setBackground(Color.LIGHT_GRAY);
+    topPanel.setPreferredSize(new Dimension(100, 20));
+    topPanel.setMinimumSize(new Dimension(100, 20));
+    topPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
     JLabel titleLabel = new JLabel("Anime View");
     titleLabel.setFont(titleLabel.getFont().deriveFont(12f));
     topPanel.add(Box.createHorizontalStrut(10));
@@ -28,16 +33,16 @@ public class AnimeViewPanel extends JPanel {
     topPanel.add(Box.createHorizontalGlue());
 
     animeViewPanel = new JPanel();
-    animeViewPanel.setLayout(new BoxLayout(animeViewPanel, BoxLayout.X_AXIS));
+    animeViewPanel.setLayout(new BorderLayout());
     animeViewPanel.setBackground(Color.WHITE);
-    animeViewPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
-    animeViewPanel.setPreferredSize(new java.awt.Dimension(800, 600));
-    animeViewPanel.setMaximumSize(new java.awt.Dimension(800, 600));
 
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
     buttonPanel.setBackground(Color.WHITE);
     buttonPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+    buttonPanel.setPreferredSize(new Dimension(100, 40));
+    buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    buttonPanel.setMinimumSize(new Dimension(100, 40));
     File startIcon = new File("src/main/resources/Icon/startIcon.png");
     File breakIcon = new File("src/main/resources/Icon/breakIcon.png");
     Image startImg = null;
@@ -64,7 +69,9 @@ public class AnimeViewPanel extends JPanel {
     buttonPanel.add(Box.createHorizontalStrut(10));
 
     add(topPanel);
+    add(Box.createGlue());
     add(animeViewPanel);
+    add(Box.createGlue());
     add(buttonPanel);
   }
 

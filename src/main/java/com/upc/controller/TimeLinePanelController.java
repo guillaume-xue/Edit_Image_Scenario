@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import com.upc.view.DividerPanel;

@@ -3,11 +3,8 @@ package com.upc.controller;
 import javax.swing.*;
 
 import com.upc.view.ImageViewPanel;
-import com.upc.view.ImportButton;
 import com.upc.view.ResizablePanel;
-import com.upc.view.ViewPanel;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

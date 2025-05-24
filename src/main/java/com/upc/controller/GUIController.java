@@ -76,7 +76,7 @@ public class GUIController {
       properties.load(getClass().getResourceAsStream("/resources.properties"));
       this.transferController = new TransferController();
       this.mouseController = new MouseController();
-      imageEditor = new ImageEditor();
+      imageEditor = new ImageEditor(transferController, imageDir);
       ViewPanel viewPanel = new ViewPanel();
       TimeLinePanel timeLinePanel = new TimeLinePanel();
       AnimeViewPanel animeViewPanel = new AnimeViewPanel();
