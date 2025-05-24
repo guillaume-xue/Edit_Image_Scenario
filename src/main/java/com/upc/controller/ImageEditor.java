@@ -28,14 +28,51 @@ public class ImageEditor {
         return view;
     }
 
+    public ImageIcon resizeImageIcon(String path, String description, int width, int height) {
+        ImageIcon tempIcon = new ImageIcon(path);
+        int maxW = width, maxH = height;
+        int iw = tempIcon.getIconWidth(), ih = tempIcon.getIconHeight();
+        double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
+        int w = (int) (iw * ratio), h = (int) (ih * ratio);
+        Image scaled = tempIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+        tempIcon.getImage().flush(); // Libère la mémoire de l'image originale
+
+        ImageIcon scaledIcon = new ImageIcon(scaled);
+        scaledIcon.setDescription(description);
+        return scaledIcon;
+    }
+
     private void initView() {
         // Ajouter les boutons à la barre d'outils
         JButton add = new JButton("+");
-        JButton penButton = new JButton("Stylo");
-        JButton eraserButton = new JButton("Gomme");
-        JButton circleButton = new JButton("Cercle");
-        JButton squareButton = new JButton("Carré");
-        JButton colorButton = new JButton("Couleur");
+        add.setPreferredSize(new Dimension(30, 30));
+        add.setMinimumSize(new Dimension(30, 30));
+        add.setMaximumSize(new Dimension(30, 30));
+        JButton penButton = new JButton();
+        penButton.setPreferredSize(new Dimension(30, 30));
+        penButton.setMinimumSize(new Dimension(30, 30));
+        penButton.setMaximumSize(new Dimension(30, 30));
+        penButton.setIcon(resizeImageIcon("src/main/resources/Icon/stylo.png", "Stylo", 20, 20));
+        JButton eraserButton = new JButton();
+        eraserButton.setMinimumSize(new Dimension(30, 30));
+        eraserButton.setMaximumSize(new Dimension(30, 30));
+        eraserButton.setPreferredSize(new Dimension(30, 30));
+        eraserButton.setIcon(resizeImageIcon("src/main/resources/Icon/gomme.png", "Gomme", 20, 20));
+        JButton circleButton = new JButton();
+        circleButton.setMinimumSize(new Dimension(30, 30));
+        circleButton.setMaximumSize(new Dimension(30, 30));
+        circleButton.setPreferredSize(new Dimension(30, 30));
+        circleButton.setIcon(resizeImageIcon("src/main/resources/Icon/cercle.png", "Cercle", 20, 20));
+        JButton squareButton = new JButton();
+        squareButton.setMinimumSize(new Dimension(30, 30));
+        squareButton.setMaximumSize(new Dimension(30, 30));
+        squareButton.setPreferredSize(new Dimension(30, 30));
+        squareButton.setIcon(resizeImageIcon("src/main/resources/Icon/carre.png", "Carré", 20, 20));
+        JButton colorButton = new JButton();
+        colorButton.setIcon(new ColorIcon(Color.BLACK, 20, "Couleur"));
+        colorButton.setMinimumSize(new Dimension(30, 30));
+        colorButton.setMaximumSize(new Dimension(30, 30));
+        colorButton.setPreferredSize(new Dimension(30, 30));
 
         view.addToolBarButton(add);
         view.addToolBarButton(penButton);
@@ -88,7 +125,7 @@ public class ImageEditor {
     }
 
     private void handleToolSelection(JButton button) {
-        String tool = button.getText();
+        String tool = button.getIcon().toString();
 
         switch (tool) {
             case "Stylo":
@@ -109,6 +146,7 @@ public class ImageEditor {
                 break;
             case "Couleur":
                 Color selectedColor = JColorChooser.showDialog(null, "Choisissez une couleur", null);
+                button.setIcon(new ColorIcon(selectedColor, 20, "Couleur"));
                 model.setSelectedColor(selectedColor);
                 break;
             case "+":
@@ -124,5 +162,45 @@ public class ImageEditor {
         // Obtenir la position du bouton
         Point location = button.getLocationOnScreen();
         thicknessPopup.show(button, 0, button.getHeight());
+    }
+
+    // Classe pour dessiner une icône de couleur
+    class ColorIcon implements Icon {
+        private final int size;
+        private Color color;
+        private String description;
+
+        public ColorIcon(Color color, int size, String description) {
+            this.color = color;
+            this.size = size;
+            this.description = description;
+        }
+
+        public void setColor(Color color) {
+            this.color = color;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            g.setColor(color);
+            g.fillOval(x, y, size, size); // Dessine un cercle rempli de la couleur
+            g.setColor(Color.BLACK);
+            g.drawOval(x, y, size - 1, size - 1); // Ajoute une bordure noire
+        }
+
+        @Override
+        public int getIconWidth() {
+            return size;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return size;
+        }
+
+        @Override
+        public String toString() {
+            return description; // Retourne la description de l'icône
+        }
     }
 }

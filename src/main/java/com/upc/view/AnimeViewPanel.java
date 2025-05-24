@@ -18,6 +18,15 @@ public class AnimeViewPanel extends JPanel {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+    JPanel topPanel = new JPanel();
+    topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+    topPanel.setBackground(Color.LIGHT_GRAY);
+    JLabel titleLabel = new JLabel("Anime View");
+    titleLabel.setFont(titleLabel.getFont().deriveFont(12f));
+    topPanel.add(Box.createHorizontalStrut(10));
+    topPanel.add(titleLabel);
+    topPanel.add(Box.createHorizontalGlue());
+
     animeViewPanel = new JPanel();
     animeViewPanel.setLayout(new BoxLayout(animeViewPanel, BoxLayout.X_AXIS));
     animeViewPanel.setBackground(Color.WHITE);
@@ -54,6 +63,7 @@ public class AnimeViewPanel extends JPanel {
     buttonPanel.add(Box.createHorizontalGlue());
     buttonPanel.add(Box.createHorizontalStrut(10));
 
+    add(topPanel);
     add(animeViewPanel);
     add(buttonPanel);
   }

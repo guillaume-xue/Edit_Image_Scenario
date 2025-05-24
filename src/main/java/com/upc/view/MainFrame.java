@@ -6,6 +6,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -25,6 +26,57 @@ public class MainFrame extends JFrame {
         tabbedPane.setTabPlacement(JTabbedPane.LEFT);
         tabbedPane.addTab("Draw", imageEditPanel);
         tabbedPane.addTab("Animation", animeViewPanel);
+        tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
+            private boolean isDragging = false;
+
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                if (tabIndex == 1 && e.getClickCount() == 2) { // Double-clic sur "Animation"
+                    SwingUtilities.invokeLater(() -> { // Différer la suppression de l'onglet
+                        tabbedPane.removeTabAt(tabIndex);
+                        JFrame animationFrame = new JFrame("Animation");
+                        animationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        animationFrame.add(animeViewPanel);
+                        animationFrame.setSize(600, 400);
+                        animationFrame.setLocationRelativeTo(null);
+                        animationFrame.setVisible(true);
+
+                        // Réattacher si la fenêtre Animation est fermée
+                        animationFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                            @Override
+                            public void windowClosed(java.awt.event.WindowEvent e) {
+                                if (!isDragging) { // Ne réinsère que si l'utilisateur n'est pas en train de glisser
+                                    tabbedPane.addTab("Animation", animeViewPanel);
+                                }
+                            }
+                        });
+
+                        // Réattacher si la fenêtre Animation est déplacée près de la fenêtre principale
+                        animationFrame.addComponentListener(new java.awt.event.ComponentAdapter() {
+                            @Override
+                            public void componentMoved(java.awt.event.ComponentEvent e) {
+                                isDragging = true; // L'utilisateur est en train de glisser
+                            }
+                        });
+
+                        animationFrame.addMouseListener(new java.awt.event.MouseAdapter() {
+                            @Override
+                            public void mouseReleased(java.awt.event.MouseEvent e) {
+                                isDragging = false; // L'utilisateur a relâché le clic
+                                java.awt.Point mainLoc = MainFrame.this.getLocationOnScreen();
+                                java.awt.Point animLoc = animationFrame.getLocationOnScreen();
+                                double distance = mainLoc.distance(animLoc);
+                                if (distance < 100) { // Seuil de proximité en pixels
+                                    animationFrame.dispose(); // Ferme la fenêtre Animation
+                                    tabbedPane.addTab("Animation", animeViewPanel); // Réinsère l'onglet
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+        });
 
         splitPane.setLeftComponent(tabbedPane);
         splitPane.setRightComponent(viewPanel);
