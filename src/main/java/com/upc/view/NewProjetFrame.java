@@ -155,10 +155,11 @@ public class NewProjetFrame extends JFrame {
     buttunPanel.add(createButton);
     buttunPanel.add(Box.createHorizontalStrut(20));
     buttunPanel.add(cancelButton);
+    buttunPanel.add(Box.createHorizontalStrut(20));
 
     mainPanel.add(Box.createVerticalStrut(20));
     mainPanel.add(folderChooserPanel);
-    mainPanel.add(Box.createVerticalStrut(370));
+    mainPanel.add(Box.createVerticalGlue());
     mainPanel.add(buttunPanel);
 
     return mainPanel;
