@@ -121,6 +121,42 @@ public class GUIController {
     }
   }
 
+  private void openFolder(boolean isNewProject) {
+    while (true) {
+      JFileChooser fileChooser = new JFileChooser();
+      fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      int returnValue = fileChooser.showOpenDialog(optionFrame);
+      if (returnValue == JFileChooser.APPROVE_OPTION) {
+        File selectedDir = fileChooser.getSelectedFile();
+        File imagesDir = new File(selectedDir, "images");
+        File propertiesFile = new File(selectedDir, "resources.properties");
+        File scenarioFile = new File(selectedDir, "scenario.txt");
+        if (selectedDir.exists() && selectedDir.isDirectory()
+            && imagesDir.exists() && imagesDir.isDirectory()
+            && propertiesFile.exists() && propertiesFile.isFile()
+            && scenarioFile.exists() && scenarioFile.isFile()) {
+          optionFrame.dispose();
+          if (isNewProject) {
+            mainFrame.dispose();
+          }
+          currentFile = selectedDir;
+          initProjectFolder(); // Initialize the project folder
+          initMainFrame(); // Initialize the main frame
+          break;
+        } else {
+          javax.swing.JOptionPane.showMessageDialog(optionFrame,
+              "Le dossier sélectionné n'est pas un dossier de projet valide.\n" +
+                  "Il doit contenir :\n- un dossier 'images'\n- un fichier 'resources.properties'\n- un fichier 'scenario.txt'",
+              "Erreur de dossier projet", javax.swing.JOptionPane.ERROR_MESSAGE);
+          // Laisse l'utilisateur choisir à nouveau
+        }
+      } else {
+        // L'utilisateur a annulé, on sort de la boucle
+        break;
+      }
+    }
+  }
+
   private void initOptionFrameListener() {
     optionFrame.getNewProjet().addActionListener(e -> {
       optionFrame.dispose();
@@ -128,36 +164,7 @@ public class GUIController {
     });
 
     optionFrame.getOpenProjet().addActionListener(e -> {
-      while (true) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnValue = fileChooser.showOpenDialog(optionFrame);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-          File selectedDir = fileChooser.getSelectedFile();
-          File imagesDir = new File(selectedDir, "images");
-          File propertiesFile = new File(selectedDir, "resources.properties");
-          File scenarioFile = new File(selectedDir, "scenario.txt");
-          if (selectedDir.exists() && selectedDir.isDirectory()
-              && imagesDir.exists() && imagesDir.isDirectory()
-              && propertiesFile.exists() && propertiesFile.isFile()
-              && scenarioFile.exists() && scenarioFile.isFile()) {
-            optionFrame.dispose();
-            currentFile = selectedDir;
-            initProjectFolder(); // Initialize the project folder
-            initMainFrame(); // Initialize the main frame
-            break;
-          } else {
-            javax.swing.JOptionPane.showMessageDialog(optionFrame,
-              "Le dossier sélectionné n'est pas un dossier de projet valide.\n" +
-              "Il doit contenir :\n- un dossier 'images'\n- un fichier 'resources.properties'\n- un fichier 'scenario.txt'",
-              "Erreur de dossier projet", javax.swing.JOptionPane.ERROR_MESSAGE);
-            // Laisse l'utilisateur choisir à nouveau
-          }
-        } else {
-          // L'utilisateur a annulé, on sort de la boucle
-          break;
-        }
-      }
+      openFolder(false);
     });
   }
 
@@ -238,7 +245,7 @@ public class GUIController {
     JMenuItem openItem = mainFrame.getMenuItem(0, 1);
     if (openItem != null) {
       openItem.addActionListener(e -> {
-
+        openFolder(true); // Open the folder for a new project
       });
     }
 
