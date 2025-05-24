@@ -1,8 +1,11 @@
 package com.upc.controller;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,6 +62,18 @@ public class ViewPanelController {
     viewImage.setTransferHandler(transferController.new TransferViewPanel());
     viewImage.addMouseListener(mouseController.new ViewPanelMouseController(viewImage, this));
     viewPanel.getMainPanel().add(viewImage);
+    updateMainPanelSize();
+  }
+
+  private void updateMainPanelSize() {
+    int count = viewPanel.getMainPanel().getComponentCount();
+    int width = Math.max(1, viewPanel.getMainPanel().getWidth() / 130);
+    int height = (count / width + 1) * 90;
+    viewPanel.getMainPanel().setPreferredSize(new Dimension(400, height));
+    viewPanel.getScrollPane().setPreferredSize(new Dimension(400, height));
+    viewPanel.getMainPanel().revalidate();
+    viewPanel.getScrollPane().revalidate();
+    viewPanel.getScrollPane().repaint();
   }
 
   public void initViewPanel(String imageDirectory) {
@@ -94,8 +109,9 @@ public class ViewPanelController {
           @Override
           protected void done() {
             emptyViewPanel();
-            viewPanel.getMainPanel().revalidate();
-            viewPanel.getMainPanel().repaint();
+            viewPanel.revalidate();
+            viewPanel.repaint();
+            updateMainPanelSize();
             if (loadingDialog != null && loadingDialog.isVisible()) {
               loadingDialog.dispose();
             }
@@ -124,6 +140,12 @@ public class ViewPanelController {
 
   public void initMouseListener() {
     importButton.addMouseListener(mouseController.new ButtonEffect(importButton));
+    viewPanel.getMainPanel().addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        updateMainPanelSize();
+      }
+    });
   }
 
   public void initActionListener(String imageDirectory) {
@@ -145,6 +167,7 @@ public class ViewPanelController {
   public void removeImageViewPanel(ImageViewPanel imageViewPanel) {
     viewPanel.getMainPanel().remove(imageViewPanel);
     emptyViewPanel();
+    updateMainPanelSize();
     viewPanel.getMainPanel().revalidate();
     viewPanel.getMainPanel().repaint();
   }
@@ -163,6 +186,7 @@ public class ViewPanelController {
         Files.copy(selectedFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         removeImportButton();
         addImageViewPanel(destinationFile.getAbsolutePath(), selectedFile.getName());
+        updateMainPanelSize();
       } catch (IOException ex) {
         ex.printStackTrace();
       }

@@ -12,6 +12,7 @@ public class AnimeViewPanel extends JPanel {
   private JPanel animeViewPanel;
   private JButton startButton;
   private JButton breakButton;
+  private JLabel timer;
 
   public AnimeViewPanel() {
     super();
@@ -26,6 +27,7 @@ public class AnimeViewPanel extends JPanel {
 
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+    buttonPanel.setBackground(Color.WHITE);
     buttonPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
     File startIcon = new File("src/main/resources/Icon/startIcon.png");
     File breakIcon = new File("src/main/resources/Icon/breakIcon.png");
@@ -39,16 +41,33 @@ public class AnimeViewPanel extends JPanel {
     }
     startButton = new JButton(new ImageIcon(startImg));
     breakButton = new JButton(new ImageIcon(breakImg));
+    breakButton.setVisible(false);
 
+    timer = new JLabel("00:00:00");
+
+    buttonPanel.add(Box.createHorizontalStrut(10));
+    buttonPanel.add(timer);
+    buttonPanel.add(Box.createHorizontalGlue());
     buttonPanel.add(startButton);
     buttonPanel.add(breakButton);
+    buttonPanel.add(Box.createHorizontalStrut(timer.getPreferredSize().width));
+    buttonPanel.add(Box.createHorizontalGlue());
+    buttonPanel.add(Box.createHorizontalStrut(10));
 
     add(animeViewPanel);
     add(buttonPanel);
   }
 
+  public void setTimer(String time) {
+    timer.setText(time);
+  }
+
   public JButton getStartButton() {
     return startButton;
+  }
+
+  public JButton getPauseButton() {
+    return breakButton;
   }
 
   public JPanel getAnimeViewPanel() {
