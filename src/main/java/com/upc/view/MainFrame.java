@@ -22,10 +22,20 @@ public class MainFrame extends JFrame {
         createMenuBar();
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(400);
+        splitPane.setEnabled(true);
+        splitPane.setDividerSize(8);
+        splitPane.setResizeWeight(0.5);
+
+        // Définir une taille minimale très faible pour permettre le redimensionnement libre
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setTabPlacement(JTabbedPane.LEFT);
         tabbedPane.addTab("Draw", imageEditPanel);
         tabbedPane.addTab("Animation", animeViewPanel);
+        tabbedPane.setMinimumSize(new Dimension(10, 10));
+        imageEditPanel.setMinimumSize(new Dimension(10, 10));
+        animeViewPanel.setMinimumSize(new Dimension(10, 10));
+        viewPanel.setMinimumSize(new Dimension(10, 10));
+
         tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
             private boolean isDragging = false;
 
@@ -80,10 +90,17 @@ public class MainFrame extends JFrame {
 
         splitPane.setLeftComponent(tabbedPane);
         splitPane.setRightComponent(viewPanel);
+
         JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         mainSplitPane.setDividerLocation(400);
-        mainSplitPane.setTopComponent(splitPane);
+        mainSplitPane.setEnabled(true);
+        mainSplitPane.setDividerSize(8);
+        mainSplitPane.setResizeWeight(0.5);
 
+        // Taille minimale faible pour le timeLinePanel
+        timeLinePanel.setMinimumSize(new Dimension(10, 10));
+
+        mainSplitPane.setTopComponent(splitPane);
         mainSplitPane.setBottomComponent(timeLinePanel);
 
         add(mainSplitPane);
@@ -96,7 +113,8 @@ public class MainFrame extends JFrame {
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         this.setLayout(new BorderLayout());
-        this.setMinimumSize(new Dimension(800, 700));
+        // Supprimer ou commenter la ligne suivante pour ne pas bloquer le redimensionnement :
+        // this.setMinimumSize(new Dimension(800, 700));
     }
 
     private void createMenuBar() {
