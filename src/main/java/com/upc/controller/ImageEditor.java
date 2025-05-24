@@ -130,8 +130,15 @@ public class ImageEditor {
     }
 
     private void handleToolSelection(JButton button) {
-        String tool = button.getIcon().toString();
-
+        String tool = button.getText();
+        if (tool == null || tool.isEmpty()) {
+            Icon icon = button.getIcon();
+            if (icon instanceof ImageIcon) {
+                tool = ((ImageIcon) icon).getDescription();
+            } else if (icon instanceof ColorIcon) {
+                tool = icon.toString();
+            }
+        }
         switch (tool) {
             case "Stylo":
                 model.setSelectedTool(0);

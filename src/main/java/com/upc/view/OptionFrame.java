@@ -31,7 +31,7 @@ public class OptionFrame extends JFrame {
   }
 
   private void setButtonDimensions(JButton... buttons) {
-    int width = 172;
+    int width = 178;
     int height = 48;
     for (JButton button : buttons) {
       button.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 16));

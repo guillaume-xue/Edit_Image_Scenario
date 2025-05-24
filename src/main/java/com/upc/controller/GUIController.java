@@ -128,14 +128,35 @@ public class GUIController {
     });
 
     optionFrame.getOpenProjet().addActionListener(e -> {
-      JFileChooser fileChooser = new JFileChooser();
-      fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      int returnValue = fileChooser.showOpenDialog(optionFrame);
-      if (returnValue == JFileChooser.APPROVE_OPTION) {
-        optionFrame.dispose();
-        currentFile = fileChooser.getSelectedFile();
-        initProjectFolder(); // Initialize the project folder
-        initMainFrame(); // Initialize the main frame
+      while (true) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnValue = fileChooser.showOpenDialog(optionFrame);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+          File selectedDir = fileChooser.getSelectedFile();
+          File imagesDir = new File(selectedDir, "images");
+          File propertiesFile = new File(selectedDir, "resources.properties");
+          File scenarioFile = new File(selectedDir, "scenario.txt");
+          if (selectedDir.exists() && selectedDir.isDirectory()
+              && imagesDir.exists() && imagesDir.isDirectory()
+              && propertiesFile.exists() && propertiesFile.isFile()
+              && scenarioFile.exists() && scenarioFile.isFile()) {
+            optionFrame.dispose();
+            currentFile = selectedDir;
+            initProjectFolder(); // Initialize the project folder
+            initMainFrame(); // Initialize the main frame
+            break;
+          } else {
+            javax.swing.JOptionPane.showMessageDialog(optionFrame,
+              "Le dossier sélectionné n'est pas un dossier de projet valide.\n" +
+              "Il doit contenir :\n- un dossier 'images'\n- un fichier 'resources.properties'\n- un fichier 'scenario.txt'",
+              "Erreur de dossier projet", javax.swing.JOptionPane.ERROR_MESSAGE);
+            // Laisse l'utilisateur choisir à nouveau
+          }
+        } else {
+          // L'utilisateur a annulé, on sort de la boucle
+          break;
+        }
       }
     });
   }
