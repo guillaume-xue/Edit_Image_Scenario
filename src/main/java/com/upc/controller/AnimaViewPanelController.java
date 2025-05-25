@@ -19,9 +19,8 @@ public class AnimaViewPanelController {
   private volatile boolean paused = false;
   private volatile boolean ended = true;
   private volatile long elapsed = 0;
-  private volatile long pauseAccum = 0;
+  private volatile boolean loop = false;
   private volatile int currentImageIndex = 0;
-  private Thread animationThread;
   private ArrayList<Map.Entry<ImageIcon, Integer>> imageWithDuration = new ArrayList<>();
 
   AnimaViewPanelController(AnimeViewPanel animeViewPanel, TimeLinePanelController timeLinePanel, File imageDirectory) {
@@ -67,8 +66,26 @@ public class AnimaViewPanelController {
         animeViewPanel.getTimelineSlider().setValue(currentImageIndex);
       }
     });
+    animeViewPanel.getLoopButton().addActionListener(e -> {
+      loop = true;
+      animeViewPanel.getLoopButton().setVisible(false);
+      animeViewPanel.getDirectButton().setVisible(true);
+    });
+    animeViewPanel.getDirectButton().addActionListener(e -> {
+      loop = false;
+      animeViewPanel.getLoopButton().setVisible(true);
+      animeViewPanel.getDirectButton().setVisible(false);
+    });
     animeViewPanel.getTimelineSlider().addChangeListener(e -> {
       currentImageIndex = animeViewPanel.getTimelineSlider().getValue();
+      if (currentImageIndex < imageWithDuration.size()) {
+        elapsed = calculateElapsedFromIndex(currentImageIndex);
+        animeViewPanel.setTimer(formatMillis(elapsed));
+        if (!paused) {
+          pauseAnimation();
+          resumeAnimation();
+        }
+      }
     });
 
   }
@@ -84,78 +101,65 @@ public class AnimaViewPanelController {
     }
   }
 
+  private void updateImagePanel(Map.Entry<ImageIcon, Integer> entry) {
+    new Thread(() -> {
+      ImageIcon image = entry.getKey();
+      File imageFile = new File(imageDirectory, image.getDescription());
+      ImageIcon originalIcon = new ImageIcon(imageFile.getAbsolutePath());
+
+      JPanel imagePanel = new DisplayAnimePanel(originalIcon);
+      imagePanel.setPreferredSize(animeViewPanel.getAnimeViewPanel().getSize());
+
+      SwingUtilities.invokeLater(() -> {
+        animeViewPanel.getAnimeViewPanel().removeAll();
+        animeViewPanel.getAnimeViewPanel().add(imagePanel);
+        animeViewPanel.getAnimeViewPanel().revalidate();
+        animeViewPanel.getAnimeViewPanel().repaint();
+      });
+    }).start();
+  }
+
   private void animatePanel() {
-    SwingUtilities.invokeLater(() -> ended = false);
+    ended = false;
 
-    animationThread = new Thread(() -> {
-      elapsed = 0;
-      pauseAccum = 0;
-
-      while (currentImageIndex < imageWithDuration.size() && !Thread.currentThread().isInterrupted()) {
+    Thread animationThread = new Thread(() -> {
+      while (currentImageIndex < imageWithDuration.size()) {
         Map.Entry<ImageIcon, Integer> entry = imageWithDuration.get(currentImageIndex);
-        animeViewPanel.getTimelineSlider().setValue(currentImageIndex - 1);
-        // Pause logic
-        synchronized (this) {
-          while (paused) {
-            long pauseStart = System.currentTimeMillis();
+        if (paused) {
+          synchronized (this) {
             try {
               wait();
             } catch (InterruptedException e) {
               Thread.currentThread().interrupt();
-              return;
             }
-            pauseAccum += System.currentTimeMillis() - pauseStart;
           }
         }
 
-        ImageIcon image = entry.getKey();
-        File imageFile = new File(imageDirectory, image.getDescription());
-        ImageIcon originalIcon = new ImageIcon(imageFile.getAbsolutePath());
+        updateImagePanel(entry);
 
-        int duration = entry.getValue();
+        elapsed += entry.getValue();
+        animeViewPanel.setTimer(formatMillis(elapsed));
+        animeViewPanel.getTimelineSlider().setValue(currentImageIndex);
 
-        JPanel imagePanel = new DisplayAnimePanel(originalIcon);
-        imagePanel.setPreferredSize(animeViewPanel.getAnimeViewPanel().getSize());
-
-        SwingUtilities.invokeLater(() -> {
-          animeViewPanel.getAnimeViewPanel().removeAll();
-          animeViewPanel.getAnimeViewPanel().add(imagePanel);
-          animeViewPanel.getAnimeViewPanel().revalidate();
-          animeViewPanel.getAnimeViewPanel().repaint();
-        });
-
-        // Timer update loop
-        long frameStart = System.currentTimeMillis();
-        long framePauseAccum = 0;
-        while (System.currentTimeMillis() - frameStart - framePauseAccum < duration / 1000) {
-          try {
-            Thread.sleep(10);
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            break;
-          }
-        }
-        elapsed = calculateElapsedFromIndex(currentImageIndex)
-            + (System.currentTimeMillis() - frameStart - framePauseAccum);
-        String timerText = formatMillis(elapsed);
-        SwingUtilities.invokeLater(() -> animeViewPanel.setTimer(timerText));
-        if (Thread.currentThread().isInterrupted())
+        try {
+          Thread.sleep(entry.getValue());
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
           break;
-        currentImageIndex++;
-      }
-      SwingUtilities.invokeLater(() -> {
-        animeViewPanel.getAnimeViewPanel().removeAll();
-        animeViewPanel.getStartButton().setVisible(true);
-        animeViewPanel.getPauseButton().setVisible(false);
-        ended = true;
-      });
-    });
+        }
 
-    animationThread.start();
-    SwingUtilities.invokeLater(() -> {
-      animeViewPanel.getAnimeViewPanel().revalidate();
-      animeViewPanel.getAnimeViewPanel().repaint();
+        currentImageIndex++;
+        if (loop && currentImageIndex >= imageWithDuration.size()) {
+          currentImageIndex = 0;
+          elapsed = 0;
+          animeViewPanel.getTimelineSlider().setValue(0);
+        }
+      }
+      ended = true;
+      animeViewPanel.getStartButton().setVisible(true);
+      animeViewPanel.getPauseButton().setVisible(false);
     });
+    animationThread.start();
   }
 
   private String formatMillis(long millis) {
