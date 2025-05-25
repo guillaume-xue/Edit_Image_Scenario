@@ -32,6 +32,7 @@ public class GUIController {
   private MouseController mouseController;
   private TimeLinePanelController timeLinePanelController;
   private ViewPanelController viewPanelController;
+  private AnimaViewPanelController animaViewPanelController;
 
   private File currentFile;
   private File imageDir;
@@ -87,7 +88,9 @@ public class GUIController {
           mouseController, loadingDialog);
       this.viewPanelController.initViewPanel(imageDir.getAbsolutePath());
       this.timeLinePanelController.initTimeLinePanel(scenarioFile, imageDir);
-      new AnimaViewPanelController(animeViewPanel, this.timeLinePanelController, imageDir);
+      this.animaViewPanelController = new AnimaViewPanelController(animeViewPanel, this.timeLinePanelController,
+          imageDir);
+      animaViewPanelController.initialize();
       initMenuBarController();
     } catch (IOException ex) {
       ex.printStackTrace();

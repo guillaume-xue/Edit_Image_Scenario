@@ -13,26 +13,33 @@ import com.upc.view.DisplayAnimePanel;
 
 public class AnimaViewPanelController {
 
-  AnimeViewPanel animeViewPanel;
-  TimeLinePanelController timeLinePanelController;
-  File imageDirectory;
+  private AnimeViewPanel animeViewPanel;
+  private TimeLinePanelController timeLinePanelController;
+  private File imageDirectory;
   private volatile boolean paused = false;
   private volatile boolean ended = true;
+  private volatile long elapsed = 0;
+  private volatile long pauseAccum = 0;
+  private volatile int currentImageIndex = 0;
   private Thread animationThread;
+  private ArrayList<Map.Entry<ImageIcon, Integer>> imageWithDuration = new ArrayList<>();
 
   AnimaViewPanelController(AnimeViewPanel animeViewPanel, TimeLinePanelController timeLinePanel, File imageDirectory) {
     this.animeViewPanel = animeViewPanel;
     this.timeLinePanelController = timeLinePanel;
     this.imageDirectory = imageDirectory;
-    initialize();
   }
 
-  private void initialize() {
+  public void initialize() {
     animeViewPanel.getStartButton().addActionListener(e -> {
       animeViewPanel.getStartButton().setVisible(false);
       animeViewPanel.getPauseButton().setVisible(true);
       if (ended) {
-        animatePanel(this.timeLinePanelController.getImageCopiesWithDurations());
+        this.imageWithDuration = timeLinePanelController.getImageCopiesWithDurations();
+        currentImageIndex = 0;
+        animeViewPanel.getTimelineSlider().setMaximum(imageWithDuration.size() - 1);
+        animeViewPanel.getTimelineSlider().setValue(0);
+        animatePanel();
       } else {
         resumeAnimation();
       }
@@ -42,29 +49,52 @@ public class AnimaViewPanelController {
       animeViewPanel.getPauseButton().setVisible(false);
       pauseAnimation();
     });
+    animeViewPanel.getBackButton().addActionListener(e -> {
+      if (currentImageIndex > 1) {
+        animeViewPanel.getStartButton().setVisible(true);
+        animeViewPanel.getPauseButton().setVisible(false);
+        pauseAnimation();
+        currentImageIndex -= 2;
+        animeViewPanel.getTimelineSlider().setValue(currentImageIndex);
+      }
+    });
+    animeViewPanel.getAdvanceButton().addActionListener(e -> {
+      if (currentImageIndex < imageWithDuration.size() - 1) {
+        animeViewPanel.getStartButton().setVisible(true);
+        animeViewPanel.getPauseButton().setVisible(false);
+        pauseAnimation();
+        currentImageIndex++;
+        animeViewPanel.getTimelineSlider().setValue(currentImageIndex);
+      }
+    });
+    animeViewPanel.getTimelineSlider().addChangeListener(e -> {
+      currentImageIndex = animeViewPanel.getTimelineSlider().getValue();
+    });
+
   }
 
-  public void pauseAnimation() {
+  private void pauseAnimation() {
     paused = true;
   }
 
-  public void resumeAnimation() {
+  private void resumeAnimation() {
     paused = false;
     synchronized (this) {
       notifyAll();
     }
   }
 
-  public void animatePanel(ArrayList<Map.Entry<ImageIcon, Integer>> imageWithDuration) {
+  private void animatePanel() {
     SwingUtilities.invokeLater(() -> ended = false);
 
     // ...existing code...
     animationThread = new Thread(() -> {
-      long startTime = System.currentTimeMillis();
-      long elapsed = 0;
-      long pauseAccum = 0; // total time spent paused
+      elapsed = 0;
+      pauseAccum = 0;
 
-      for (Map.Entry<ImageIcon, Integer> entry : imageWithDuration) {
+      while (currentImageIndex < imageWithDuration.size() && !Thread.currentThread().isInterrupted()) {
+        Map.Entry<ImageIcon, Integer> entry = imageWithDuration.get(currentImageIndex);
+        animeViewPanel.getTimelineSlider().setValue(currentImageIndex - 1);
         // Pause logic
         synchronized (this) {
           while (paused) {
@@ -98,36 +128,21 @@ public class AnimaViewPanelController {
         // Timer update loop
         long frameStart = System.currentTimeMillis();
         long framePauseAccum = 0;
-        while (System.currentTimeMillis() - frameStart - framePauseAccum < duration) {
-          // Pause logic inside timer loop
-          synchronized (this) {
-            if (paused) {
-              long pauseStart = System.currentTimeMillis();
-              while (paused) {
-                try {
-                  wait();
-                } catch (InterruptedException e) {
-                  Thread.currentThread().interrupt();
-                  return;
-                }
-              }
-              long pauseEnd = System.currentTimeMillis();
-              pauseAccum += pauseEnd - pauseStart;
-              framePauseAccum += pauseEnd - pauseStart;
-            }
-          }
-          elapsed = System.currentTimeMillis() - startTime - pauseAccum;
-          String timerText = formatMillis(elapsed);
-          SwingUtilities.invokeLater(() -> animeViewPanel.setTimer(timerText));
+        while (System.currentTimeMillis() - frameStart - framePauseAccum < duration / 1000) {
           try {
-            Thread.sleep(100); // update timer every 100ms
+            Thread.sleep(10);
           } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             break;
           }
         }
+        elapsed = calculateElapsedFromIndex(currentImageIndex)
+            + (System.currentTimeMillis() - frameStart - framePauseAccum);
+        String timerText = formatMillis(elapsed);
+        SwingUtilities.invokeLater(() -> animeViewPanel.setTimer(timerText));
         if (Thread.currentThread().isInterrupted())
           break;
+        currentImageIndex++;
       }
       SwingUtilities.invokeLater(() -> {
         animeViewPanel.getAnimeViewPanel().removeAll();
@@ -151,6 +166,14 @@ public class AnimaViewPanelController {
     seconds = seconds % 60;
     minutes = minutes % 60;
     return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+  }
+
+  private long calculateElapsedFromIndex(int index) {
+    long totalElapsed = 0;
+    for (int i = 0; i < index; i++) {
+      totalElapsed += imageWithDuration.get(i).getValue();
+    }
+    return totalElapsed;
   }
 
 }
