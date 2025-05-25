@@ -13,7 +13,7 @@ import java.awt.Dimension;
 
 public class MainFrame extends JFrame {
 
-    public MainFrame(ImageEditPanel imageEditPanel, ViewPanel viewPanel, TimeLinePanel timeLinePanel,
+    public MainFrame(ImageEditorView imageEditPanel, ViewPanel viewPanel, TimeLinePanel timeLinePanel,
             AnimeViewPanel animeViewPanel) {
         init();
         // Configurer le menu pour Mac

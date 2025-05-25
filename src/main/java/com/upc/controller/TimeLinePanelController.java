@@ -1,9 +1,7 @@
 package com.upc.controller;
 
-import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Map;
 

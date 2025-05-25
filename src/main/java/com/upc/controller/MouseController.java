@@ -8,11 +8,10 @@ import com.upc.view.ResizablePanel;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 
 public class MouseController {
 
-  public class TimeLinePanelMouseController extends MouseAdapter implements MouseMotionListener {
+  public class TimeLinePanelMouseController extends MouseAdapter {
 
     ResizablePanel resizablePanel;
     TimeLinePanelController timeLinePanelController;

@@ -1,29 +1,29 @@
 package com.upc.controller;
 
 import com.upc.model.ImageEditorModel;
-import com.upc.view.ImageEditPanel;
+import com.upc.view.ImageEditorView;
 import com.upc.view.DrawingPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
-public class ImageEditor {
+public class ImageEditorController {
     private ImageEditorModel model;
-    private ImageEditPanel view;
+    private ImageEditorView view;
     private GUIController guiController;
-    private JPopupMenu thicknessPopup;
     private TransferController transferController;
     private File imageDir;
     private int cpt = 0;
+    private JPopupMenu thicknessPopup;
 
-    public ImageEditor(TransferController transferController, File imageDir, GUIController guiController) {
+    public ImageEditorController(TransferController transferController, File imageDir, GUIController guiController) {
         this.model = new ImageEditorModel();
-        this.view = new ImageEditPanel();
+        this.view = new ImageEditorView();
         this.imageDir = imageDir;
         this.transferController = transferController;
         this.guiController = guiController;
-        initView();
+        initThicknessPopup();
         initController();
     }
 
@@ -31,86 +31,8 @@ public class ImageEditor {
         return model;
     }
 
-    public ImageEditPanel getImageEditPanel() {
+    public ImageEditorView getImageEditPanel() {
         return view;
-    }
-
-    public ImageIcon resizeImageIcon(String path, String description, int width, int height) {
-        ImageIcon tempIcon = new ImageIcon(path);
-        int maxW = width, maxH = height;
-        int iw = tempIcon.getIconWidth(), ih = tempIcon.getIconHeight();
-        double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
-        int w = (int) (iw * ratio), h = (int) (ih * ratio);
-        Image scaled = tempIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-        tempIcon.getImage().flush(); // Libère la mémoire de l'image originale
-
-        ImageIcon scaledIcon = new ImageIcon(scaled);
-        scaledIcon.setDescription(description);
-        return scaledIcon;
-    }
-
-    private void initView() {
-        // Ajouter les boutons à la barre d'outils
-        JButton add = new JButton("+");
-        add.setPreferredSize(new Dimension(30, 30));
-        add.setMinimumSize(new Dimension(30, 30));
-        add.setMaximumSize(new Dimension(30, 30));
-        JButton penButton = new JButton();
-        penButton.setPreferredSize(new Dimension(30, 30));
-        penButton.setMinimumSize(new Dimension(30, 30));
-        penButton.setMaximumSize(new Dimension(30, 30));
-        penButton.setIcon(resizeImageIcon("src/main/resources/Icon/stylo.png", "Stylo", 20, 20));
-        JButton eraserButton = new JButton();
-        eraserButton.setMinimumSize(new Dimension(30, 30));
-        eraserButton.setMaximumSize(new Dimension(30, 30));
-        eraserButton.setPreferredSize(new Dimension(30, 30));
-        eraserButton.setIcon(resizeImageIcon("src/main/resources/Icon/gomme.png", "Gomme", 20, 20));
-        JButton circleButton = new JButton();
-        circleButton.setMinimumSize(new Dimension(30, 30));
-        circleButton.setMaximumSize(new Dimension(30, 30));
-        circleButton.setPreferredSize(new Dimension(30, 30));
-        circleButton.setIcon(resizeImageIcon("src/main/resources/Icon/cercle.png", "Cercle", 20, 20));
-        JButton squareButton = new JButton();
-        squareButton.setMinimumSize(new Dimension(30, 30));
-        squareButton.setMaximumSize(new Dimension(30, 30));
-        squareButton.setPreferredSize(new Dimension(30, 30));
-        squareButton.setIcon(resizeImageIcon("src/main/resources/Icon/carre.png", "Carré", 20, 20));
-        JButton colorButton = new JButton();
-        colorButton.setIcon(new ColorIcon(Color.BLACK, 20, "Couleur"));
-        colorButton.setMinimumSize(new Dimension(30, 30));
-        colorButton.setMaximumSize(new Dimension(30, 30));
-        colorButton.setPreferredSize(new Dimension(30, 30));
-        JButton clearButton = new JButton();
-        clearButton.setMinimumSize(new Dimension(30, 30));
-        clearButton.setMaximumSize(new Dimension(30, 30));
-        clearButton.setPreferredSize(new Dimension(30, 30));
-        clearButton.setIcon(resizeImageIcon("src/main/resources/Icon/effacer.png", "Clear", 20, 20));
-        JButton validateButton = new JButton();
-        validateButton.setMinimumSize(new Dimension(30, 30));
-        validateButton.setMaximumSize(new Dimension(30, 30));
-        validateButton.setPreferredSize(new Dimension(30, 30));
-        validateButton.setIcon(resizeImageIcon("src/main/resources/Icon/verifier.png", "Valider", 20, 20));
-
-        view.addToolBarButton(add);
-        view.addToolBarButton(penButton);
-        view.addToolBarButton(eraserButton);
-        view.addToolBarButton(circleButton);
-        view.addToolBarButton(squareButton);
-        view.addToolBarButton(colorButton);
-        view.addToolBarButton(clearButton);
-        view.addToolBarButton(validateButton);
-
-        // Créer les panneaux de dessin
-        DrawingPanel panel1 = new DrawingPanel();
-
-        // Configurer les contrôleurs après la création des panneaux
-        DrawingController controller1 = new DrawingController(panel1, model, transferController, imageDir);
-
-        panel1.setController(controller1); // Associez le contrôleur au panneau
-        view.addDrawingPanel("Dessin 1", panel1);
-        cpt += 2;
-        initThicknessPopup();
-
     }
 
     private void initController() {
@@ -121,22 +43,6 @@ public class ImageEditor {
                 button.addActionListener(e -> handleToolSelection(button));
             }
         }
-    }
-
-    private void initThicknessPopup() {
-        thicknessPopup = new JPopupMenu();
-        JSlider thicknessSlider = new JSlider(0, 100, model.getStrokeWidth() + 1); // Min: 1, Max: 20
-        thicknessSlider.setPaintTicks(true);
-        thicknessSlider.setPaintLabels(true);
-        thicknessSlider.setMajorTickSpacing(20);
-        thicknessSlider.setMinorTickSpacing(10);
-
-        thicknessSlider.addChangeListener(e -> {
-            int thickness = thicknessSlider.getValue();
-            model.setStrokeWidth(thickness);
-        });
-
-        thicknessPopup.add(thicknessSlider);
     }
 
     private void handleToolSelection(JButton button) {
@@ -222,8 +128,25 @@ public class ImageEditor {
         thicknessPopup.show(button, 0, button.getHeight());
     }
 
+    
+    private void initThicknessPopup() {
+        thicknessPopup = new JPopupMenu();
+        JSlider thicknessSlider = new JSlider(0, 100, model.getStrokeWidth() + 1); // Min: 1, Max: 20
+        thicknessSlider.setPaintTicks(true);
+        thicknessSlider.setPaintLabels(true);
+        thicknessSlider.setMajorTickSpacing(20);
+        thicknessSlider.setMinorTickSpacing(10);
+
+        thicknessSlider.addChangeListener(e -> {
+            int thickness = thicknessSlider.getValue();
+            model.setStrokeWidth(thickness);
+        });
+
+        thicknessPopup.add(thicknessSlider);
+    }
+
     // Classe pour dessiner une icône de couleur
-    class ColorIcon implements Icon {
+    public static class ColorIcon implements Icon {
         private final int size;
         private Color color;
         private String description;

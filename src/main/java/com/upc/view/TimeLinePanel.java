@@ -10,12 +10,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
+import com.upc.controller.TimeLinePanelController;
+
 public class TimeLinePanel extends JPanel {
     private JPanel timeLineScene;
     private TimePanel numbersPanel;
     private double zoomFactor = 1.0;
     private JScrollPane scrollPane;
-    private com.upc.controller.TimeLinePanelController controller;
+    private TimeLinePanelController controller;
     private JButton zoomInButton;
     private JButton zoomOutButton;
     private JPanel endMarginPanel = new JPanel(); // Marge de fin
@@ -76,7 +78,6 @@ public class TimeLinePanel extends JPanel {
         this.controller = controller;
         zoomInButton.addActionListener(e -> controller.zoomIn());
         zoomOutButton.addActionListener(e -> controller.zoomOut());
-        // ...vous pouvez aussi ajouter ici l'écouteur de molette si besoin...
     }
 
     public JPanel getTimeLinePanel() {

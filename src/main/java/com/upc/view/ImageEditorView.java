@@ -1,14 +1,18 @@
 package com.upc.view;
 
 import javax.swing.*;
-import java.awt.*;
 
-public class ImageEditPanel extends JPanel {
+import com.upc.controller.DrawingController;
+
+import java.awt.*;
+import com.upc.controller.ImageEditorController.ColorIcon;;
+
+public class ImageEditorView extends JPanel {
     private JToolBar toolBar;
     private JTabbedPane tabbedPane;
     private JSlider thicknessSlider;
 
-    public ImageEditPanel() {
+    public ImageEditorView() {
         super();
         setLayout(new BorderLayout());
         toolBar = new JToolBar();
@@ -16,6 +20,75 @@ public class ImageEditPanel extends JPanel {
 
         add(toolBar, BorderLayout.NORTH);
         add(tabbedPane, BorderLayout.CENTER);
+
+        initView();
+    }
+
+    private void initView() {
+        // Ajouter les boutons à la barre d'outils
+        JButton add = new JButton("+");
+        add.setPreferredSize(new Dimension(30, 30));
+        add.setMinimumSize(new Dimension(30, 30));
+        add.setMaximumSize(new Dimension(30, 30));
+        JButton penButton = new JButton();
+        penButton.setPreferredSize(new Dimension(30, 30));
+        penButton.setMinimumSize(new Dimension(30, 30));
+        penButton.setMaximumSize(new Dimension(30, 30));
+        penButton.setIcon(resizeImageIcon("src/main/resources/Icon/stylo.png", "Stylo", 20, 20));
+        JButton eraserButton = new JButton();
+        eraserButton.setMinimumSize(new Dimension(30, 30));
+        eraserButton.setMaximumSize(new Dimension(30, 30));
+        eraserButton.setPreferredSize(new Dimension(30, 30));
+        eraserButton.setIcon(resizeImageIcon("src/main/resources/Icon/gomme.png", "Gomme", 20, 20));
+        JButton circleButton = new JButton();
+        circleButton.setMinimumSize(new Dimension(30, 30));
+        circleButton.setMaximumSize(new Dimension(30, 30));
+        circleButton.setPreferredSize(new Dimension(30, 30));
+        circleButton.setIcon(resizeImageIcon("src/main/resources/Icon/cercle.png", "Cercle", 20, 20));
+        JButton squareButton = new JButton();
+        squareButton.setMinimumSize(new Dimension(30, 30));
+        squareButton.setMaximumSize(new Dimension(30, 30));
+        squareButton.setPreferredSize(new Dimension(30, 30));
+        squareButton.setIcon(resizeImageIcon("src/main/resources/Icon/carre.png", "Carré", 20, 20));
+        JButton colorButton = new JButton();
+        colorButton.setIcon(new ColorIcon(Color.BLACK, 20, "Couleur"));
+        colorButton.setMinimumSize(new Dimension(30, 30));
+        colorButton.setMaximumSize(new Dimension(30, 30));
+        colorButton.setPreferredSize(new Dimension(30, 30));
+        JButton clearButton = new JButton();
+        clearButton.setMinimumSize(new Dimension(30, 30));
+        clearButton.setMaximumSize(new Dimension(30, 30));
+        clearButton.setPreferredSize(new Dimension(30, 30));
+        clearButton.setIcon(resizeImageIcon("src/main/resources/Icon/effacer.png", "Clear", 20, 20));
+        JButton validateButton = new JButton();
+        validateButton.setMinimumSize(new Dimension(30, 30));
+        validateButton.setMaximumSize(new Dimension(30, 30));
+        validateButton.setPreferredSize(new Dimension(30, 30));
+        validateButton.setIcon(resizeImageIcon("src/main/resources/Icon/verifier.png", "Valider", 20, 20));
+
+        addToolBarButton(add);
+        addToolBarButton(penButton);
+        addToolBarButton(eraserButton);
+        addToolBarButton(circleButton);
+        addToolBarButton(squareButton);
+        addToolBarButton(colorButton);
+        addToolBarButton(clearButton);
+        addToolBarButton(validateButton);
+
+    }
+
+    public ImageIcon resizeImageIcon(String path, String description, int width, int height) {
+        ImageIcon tempIcon = new ImageIcon(path);
+        int maxW = width, maxH = height;
+        int iw = tempIcon.getIconWidth(), ih = tempIcon.getIconHeight();
+        double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
+        int w = (int) (iw * ratio), h = (int) (ih * ratio);
+        Image scaled = tempIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+        tempIcon.getImage().flush(); // Libère la mémoire de l'image originale
+
+        ImageIcon scaledIcon = new ImageIcon(scaled);
+        scaledIcon.setDescription(description);
+        return scaledIcon;
     }
 
     public void addToolBarButton(JButton button) {

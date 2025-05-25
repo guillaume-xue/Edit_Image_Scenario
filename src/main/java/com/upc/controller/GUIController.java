@@ -26,7 +26,7 @@ public class GUIController {
   private OptionFrame optionFrame;
   private NewProjetFrame newProjetFrame;
 
-  private ImageEditor imageEditor;
+  private ImageEditorController imageEditor;
 
   private TransferController transferController;
   private MouseController mouseController;
@@ -76,7 +76,7 @@ public class GUIController {
       properties.load(getClass().getResourceAsStream("/resources.properties"));
       this.transferController = new TransferController();
       this.mouseController = new MouseController();
-      imageEditor = new ImageEditor(transferController, imageDir, this);
+      imageEditor = new ImageEditorController(transferController, imageDir, this);
       ViewPanel viewPanel = new ViewPanel();
       TimeLinePanel timeLinePanel = new TimeLinePanel();
       AnimeViewPanel animeViewPanel = new AnimeViewPanel();
