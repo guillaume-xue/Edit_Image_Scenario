@@ -76,7 +76,7 @@ public class GUIController {
       properties.load(getClass().getResourceAsStream("/resources.properties"));
       this.transferController = new TransferController();
       this.mouseController = new MouseController();
-      imageEditor = new ImageEditor(transferController, imageDir);
+      imageEditor = new ImageEditor(transferController, imageDir, this);
       ViewPanel viewPanel = new ViewPanel();
       TimeLinePanel timeLinePanel = new TimeLinePanel();
       AnimeViewPanel animeViewPanel = new AnimeViewPanel();
@@ -273,6 +273,12 @@ public class GUIController {
       redoItem.addActionListener(e -> {
         // Add logic for redo operation
       });
+    }
+  }
+
+  public void updateViewPanel(String imagePath, String imageName) {
+    if (viewPanelController != null) {
+      viewPanelController.addOrUpdateImage(imagePath, imageName);
     }
   }
 

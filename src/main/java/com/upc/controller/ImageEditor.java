@@ -11,16 +11,18 @@ import java.io.File;
 public class ImageEditor {
     private ImageEditorModel model;
     private ImageEditPanel view;
+    private GUIController guiController;
     private JPopupMenu thicknessPopup;
     private TransferController transferController;
     private File imageDir;
     private int cpt = 0;
 
-    public ImageEditor(TransferController transferController, File imageDir) {
+    public ImageEditor(TransferController transferController, File imageDir, GUIController guiController) {
         this.model = new ImageEditorModel();
         this.view = new ImageEditPanel();
         this.imageDir = imageDir;
         this.transferController = transferController;
+        this.guiController = guiController;
         initView();
         initController();
     }
@@ -78,6 +80,16 @@ public class ImageEditor {
         colorButton.setMinimumSize(new Dimension(30, 30));
         colorButton.setMaximumSize(new Dimension(30, 30));
         colorButton.setPreferredSize(new Dimension(30, 30));
+        JButton clearButton = new JButton();
+        clearButton.setMinimumSize(new Dimension(30, 30));
+        clearButton.setMaximumSize(new Dimension(30, 30));
+        clearButton.setPreferredSize(new Dimension(30, 30));
+        clearButton.setIcon(resizeImageIcon("src/main/resources/Icon/effacer.png", "Clear", 20, 20));
+        JButton validateButton = new JButton();
+        validateButton.setMinimumSize(new Dimension(30, 30));
+        validateButton.setMaximumSize(new Dimension(30, 30));
+        validateButton.setPreferredSize(new Dimension(30, 30));
+        validateButton.setIcon(resizeImageIcon("src/main/resources/Icon/verifier.png", "Valider", 20, 20));
 
         view.addToolBarButton(add);
         view.addToolBarButton(penButton);
@@ -85,19 +97,17 @@ public class ImageEditor {
         view.addToolBarButton(circleButton);
         view.addToolBarButton(squareButton);
         view.addToolBarButton(colorButton);
+        view.addToolBarButton(clearButton);
+        view.addToolBarButton(validateButton);
 
         // Créer les panneaux de dessin
         DrawingPanel panel1 = new DrawingPanel();
-        DrawingPanel panel2 = new DrawingPanel();
 
         // Configurer les contrôleurs après la création des panneaux
         DrawingController controller1 = new DrawingController(panel1, model, transferController, imageDir);
-        DrawingController controller2 = new DrawingController(panel2, model, transferController, imageDir);
 
         panel1.setController(controller1); // Associez le contrôleur au panneau
-        panel2.setController(controller2);
         view.addDrawingPanel("Dessin 1", panel1);
-        view.addDrawingPanel("Dessin 2", panel2);
         cpt += 2;
         initThicknessPopup();
 
@@ -167,6 +177,42 @@ public class ImageEditor {
                 newPanel.setController(newController);
                 view.addDrawingPanel("Dessin " + (++cpt), newPanel);
                 break;
+            case "Clear":
+                JPanel selectedPanel = view.getSelectedDrawingPanel();
+                if (selectedPanel instanceof com.upc.view.DrawingPanel) {
+                    com.upc.view.DrawingPanel drawingPanel = (com.upc.view.DrawingPanel) selectedPanel;
+                    if (!drawingPanel.isEmpty()) {
+                        drawingPanel.clearAll();
+                    } else {
+                        int idx = view.getTabbedPane().getSelectedIndex();
+                        if (idx != -1) {
+                            view.getTabbedPane().removeTabAt(idx);
+                        }
+                    }
+                }
+                break;
+            case "Valider":
+                JPanel selectedPanelValider = view.getSelectedDrawingPanel();
+                if (selectedPanelValider instanceof DrawingPanel) {
+                    DrawingPanel drawingPanel = (DrawingPanel) selectedPanelValider;
+                    // Récupérer le nom de l'onglet
+                    int idx = view.getTabbedPane().getSelectedIndex();
+                    if (idx != -1) {
+                        String tabName = view.getTabbedPane().getTitleAt(idx);
+                        // Nettoyer le nom pour éviter les caractères interdits dans un nom de fichier
+                        String fileName = tabName.replaceAll("[^a-zA-Z0-9-_\\.]", "_") + ".png";
+                        File outputFile = new File(imageDir, fileName);
+                        try {
+                            javax.imageio.ImageIO.write(drawingPanel.getBufferedImage(), "png", outputFile);
+                            showTemporaryMessage("Dessin sauvegardé sous : " + outputFile.getAbsolutePath());
+                            // Actualiser la vue des images
+                            guiController.updateViewPanel(outputFile.getAbsolutePath(), fileName);
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(null, "Erreur lors de la sauvegarde : " + ex.getMessage());
+                        }
+                    }
+                }
+                break;
         }
     }
 
@@ -214,5 +260,17 @@ public class ImageEditor {
         public String toString() {
             return description; // Retourne la description de l'icône
         }
+    }
+
+    // Affiche un message temporaire qui disparaît après 2 secondes
+    private void showTemporaryMessage(String message) {
+        JOptionPane pane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = pane.createDialog(null, "Information");
+        dialog.setModal(false); // Permet de ne pas bloquer l'UI
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+
+        // Timer pour fermer la fenêtre après 2 secondes (2000 ms)
+        new javax.swing.Timer(2000, e -> dialog.dispose()).start();
     }
 }

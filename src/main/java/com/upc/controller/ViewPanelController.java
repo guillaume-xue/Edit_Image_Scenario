@@ -195,4 +195,35 @@ public class ViewPanelController {
     viewPanel.getMainPanel().repaint();
   }
 
+  public void addOrUpdateImage(String imagePath, String imageName) {
+    boolean found = false;
+    for (java.awt.Component comp : viewPanel.getMainPanel().getComponents()) {
+        if (comp instanceof com.upc.view.ImageViewPanel) {
+            ImageViewPanel panel = (ImageViewPanel) comp;
+            ImageIcon icon = panel.getImageIcon();
+            if (icon != null && imageName.equals(icon.getDescription())) {
+                // Actualiser l'image (remplacer l'icône)
+                ImageIcon newIcon = new ImageIcon(imagePath);
+                int maxW = 120, maxH = 80;
+                int iw = newIcon.getIconWidth(), ih = newIcon.getIconHeight();
+                double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
+                int w = (int) (iw * ratio), h = (int) (ih * ratio);
+                Image scaled = newIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                newIcon.getImage().flush();
+                ImageIcon scaledIcon = new ImageIcon(scaled);
+                scaledIcon.setDescription(imageName);
+                panel.setImageIcon(scaledIcon);
+                panel.repaint();
+                found = true;
+                break;
+            }
+        }
+    }
+    if (!found) {
+        // Si non trouvé, on ajoute
+        addImageViewPanel(imagePath, imageName);
+    }
+    viewPanel.getMainPanel().revalidate();
+    viewPanel.getMainPanel().repaint();
+  }
 }

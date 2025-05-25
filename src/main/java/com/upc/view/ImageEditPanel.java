@@ -46,68 +46,75 @@ public class ImageEditPanel extends JPanel {
 
     public class ClosableTabComponent extends JPanel {
         private JButton closeButton;
+        private JLabel titleLabel;
+
+        private javax.swing.Timer singleClickTimer;
+        private final int DOUBLE_CLICK_DELAY = 100; // ms
 
         public ClosableTabComponent(JTabbedPane tabbedPane, int index) {
             super(new FlowLayout(FlowLayout.LEFT, 0, 0));
             setOpaque(false);
 
-            // Ajouter le titre de l'onglet
-            JLabel titleLabel = new JLabel(tabbedPane.getTitleAt(index));
+            titleLabel = new JLabel(tabbedPane.getTitleAt(index));
             add(titleLabel);
 
-            // Ajouter un bouton de fermeture
-            closeButton = new JButton(" X");
-            closeButton.setMargin(new Insets(0, 0, 0, 0));
-            closeButton.setBorder(BorderFactory.createEmptyBorder());
-            closeButton.setFocusPainted(false);
-            closeButton.setContentAreaFilled(false);
-
-            // Définir une taille fixe pour le bouton
-            closeButton.setVisible(false); // Masquer le bouton par défaut
-
-            // Ajouter un écouteur pour fermer l'onglet
-            closeButton.addActionListener(e -> {
-                int tabIndex = tabbedPane.indexOfTabComponent(ClosableTabComponent.this);
-                if (tabIndex != -1) {
-                    tabbedPane.remove(tabIndex);
-                }
-            });
-
-            add(closeButton);
-
-            addMouseListener(new java.awt.event.MouseAdapter() {
+            // Edition directe du nom d'onglet
+            titleLabel.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    closeButton.setVisible(true); // Afficher le bouton lorsque la souris entre dans le composant
-                }
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+                        int tabIndex = tabbedPane.indexOfTabComponent(ClosableTabComponent.this);
+                        if (singleClickTimer != null && singleClickTimer.isRunning()) {
+                            singleClickTimer.stop();
+                        }
+                        if (tabIndex != -1) {
+                            remove(titleLabel);
+                            JTextField textField = new JTextField(titleLabel.getText());
+                            textField.setColumns(10);
+                            add(textField, 0);
+                            revalidate();
+                            repaint();
+                            textField.requestFocusInWindow();
 
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent e) {
-                    // Vérifier si la souris n'est pas sur le composant ou le bouton avant de
-                    // masquer
-                    if (!closeButton.getBounds().contains(e.getPoint())) {
-                        closeButton.setVisible(false);
+                            // Validation par Entrée ou perte de focus
+                            textField.addActionListener(ev -> finishEdit(tabbedPane, tabIndex, textField));
+                            textField.addFocusListener(new java.awt.event.FocusAdapter() {
+                                @Override
+                                public void focusLost(java.awt.event.FocusEvent ev) {
+                                    finishEdit(tabbedPane, tabIndex, textField);
+                                }
+                            });
+                        }
+                    } else if (e.getClickCount() == 1) {
+                        // Simple clic : attendre pour voir si c’est un double-clic
+                        if (singleClickTimer != null && singleClickTimer.isRunning()) {
+                            singleClickTimer.stop();
+                        }
+                        // Conversion des coordonnées du label vers le tabbedPane
+                        Point tabbedPanePoint = SwingUtilities.convertPoint(titleLabel, e.getPoint(), tabbedPane);
+                        int tabIndex = tabbedPane.indexAtLocation(tabbedPanePoint.x, tabbedPanePoint.y);
+                        singleClickTimer = new javax.swing.Timer(DOUBLE_CLICK_DELAY, evt -> {
+                            if (tabIndex != -1 && tabbedPane.getSelectedIndex() != tabIndex) {
+                                tabbedPane.setSelectedIndex(tabIndex);
+                            }
+                        });
+                        singleClickTimer.setRepeats(false);
+                        singleClickTimer.start();
                     }
                 }
             });
+        }
 
-            // Ajouter un écouteur de souris pour le bouton
-            closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    closeButton.setVisible(true); // Garder le bouton visible lorsque la souris est dessus
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent e) {
-                    // Vérifier si la souris n'est pas sur le composant principal avant de masquer
-                    Point point = SwingUtilities.convertPoint(closeButton, e.getPoint(), ClosableTabComponent.this);
-                    if (!ClosableTabComponent.this.getBounds().contains(point)) {
-                        closeButton.setVisible(false);
-                    }
-                }
-            });
-
+        private void finishEdit(JTabbedPane tabbedPane, int tabIndex, JTextField textField) {
+            String newTitle = textField.getText().trim();
+            if (!newTitle.isEmpty()) {
+                titleLabel.setText(newTitle);
+                tabbedPane.setTitleAt(tabIndex, newTitle);
+            }
+            remove(textField);
+            add(titleLabel, 0);
+            revalidate();
+            repaint();
         }
 
         public JButton geButtontCloseButton() {

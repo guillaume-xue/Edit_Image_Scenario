@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class DrawingPanel extends JPanel {
-    private Dimension dim;
     private BufferedImage bi;
     private Graphics2D gi;
     private DrawingController controller;
@@ -15,21 +14,11 @@ public class DrawingPanel extends JPanel {
     private Color previewColor;
     private boolean isPreviewing = false;
     private String previewShape = ""; // "Cercle" ou "Carré"
+    private Dimension dim;
 
     public DrawingPanel() {
         super();
         setBackground(Color.WHITE);
-        dim = new Dimension(500, 500);
-    }
-
-    public void initializeCanvas() {
-        if (bi == null) {
-            bi = new BufferedImage((int) dim.getWidth(), (int) dim.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            gi = (Graphics2D) bi.getGraphics();
-            gi.setColor(getBackground());
-            gi.fillRect(0, 0, (int) dim.getWidth(), (int) dim.getHeight());
-            gi.setStroke(new BasicStroke(1));
-        }
     }
 
     public void drawLine(int ox, int oy, int x, int y, Color color, int strokeWidth) {
@@ -48,6 +37,7 @@ public class DrawingPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        initializeCanvas(); // S'assurer que le canvas est initialisé
         if (bi != null) {
             g.drawImage(bi, 0, 0, null);
         }
@@ -71,7 +61,7 @@ public class DrawingPanel extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        return dim;
+        return getSize();
     }
 
     public void drawOval(int x, int y, int width, int height, Color color, int strokeWidth) {
@@ -113,5 +103,83 @@ public class DrawingPanel extends JPanel {
     public void clearPreview() {
         this.isPreviewing = false;
         repaint();
+    }
+
+    public boolean isEmpty() {
+        if (bi == null) return true;
+        int w = bi.getWidth();
+        int h = bi.getHeight();
+        int[] pixels = new int[w * h];
+        bi.getRGB(0, 0, w, h, pixels, 0, w);
+        for (int rgb : pixels) {
+            if ((rgb & 0x00FFFFFF) != 0x00FFFFFF) { // Différent de blanc
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void clearAll() {
+        if (bi == null) return;
+        gi.setColor(Color.WHITE);
+        gi.fillRect(0, 0, bi.getWidth(), bi.getHeight());
+        repaint();
+    }
+
+    public BufferedImage getBufferedImage() {
+        return bi;
+    }
+
+    @Override
+    public void setBounds(int x, int y, int width, int height) {
+        super.setBounds(x, y, width, height);
+        resizeCanvas(width, height);
+    }
+
+    private void resizeCanvas(int newWidth, int newHeight) {
+        if (newWidth <= 0 || newHeight <= 0) return;
+
+        if (bi == null) {
+            // Première initialisation
+            dim = new Dimension(newWidth, newHeight);
+            initializeCanvas();
+            return;
+        }
+
+        if (bi.getWidth() == newWidth && bi.getHeight() == newHeight) return;
+
+        BufferedImage newBi = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = newBi.createGraphics();
+        // Remplir en blanc
+        g2.setColor(Color.WHITE);
+        g2.fillRect(0, 0, newWidth, newHeight);
+        // Dessiner l'ancienne image (rognée si besoin)
+        int w = Math.min(bi.getWidth(), newWidth);
+        int h = Math.min(bi.getHeight(), newHeight);
+        g2.drawImage(bi, 0, 0, w, h, 0, 0, w, h, null);
+        g2.dispose();
+
+        bi = newBi;
+        gi = (Graphics2D) bi.getGraphics();
+        dim = new Dimension(newWidth, newHeight);
+        repaint();
+    }
+
+    public void initializeCanvas() {
+        int w = getWidth();
+        int h = getHeight();
+        if (w <= 0 || h <= 0) {
+            // Si le panel n'est pas encore affiché, utilise une taille par défaut minimale
+            w = 1;
+            h = 1;
+        }
+        if (bi == null || bi.getWidth() != w || bi.getHeight() != h) {
+            bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+            gi = (Graphics2D) bi.getGraphics();
+            gi.setColor(getBackground());
+            gi.fillRect(0, 0, w, h);
+            gi.setStroke(new BasicStroke(1));
+            dim = new Dimension(w, h);
+        }
     }
 }
