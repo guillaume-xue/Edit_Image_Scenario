@@ -36,6 +36,26 @@ public class MouseController {
         });
         menu.add(del);
 
+        // Ajout du bouton "Temps"
+        JMenuItem setTime = new JMenuItem("Temps");
+        setTime.addActionListener(event -> {
+          // Ouvre un petit JDialog pour saisir la durée en ms
+          String input = JOptionPane.showInputDialog(resizablePanel, "Entrer la durée (ms) :", resizablePanel.getDuration());
+          if (input != null) {
+            try {
+              int newDuration = Integer.parseInt(input.trim());
+              if (newDuration > 0) {
+                resizablePanel.setDuration(newDuration);
+              } else {
+                JOptionPane.showMessageDialog(resizablePanel, "La durée doit être positive.", "Erreur", JOptionPane.ERROR_MESSAGE);
+              }
+            } catch (NumberFormatException ex) {
+              JOptionPane.showMessageDialog(resizablePanel, "Entrée invalide.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+          }
+        });
+        menu.add(setTime);
+
         // Ajout des actions de déplacement
         JMenuItem moveStart = new JMenuItem("Début");
         moveStart.addActionListener(event -> {
@@ -113,7 +133,8 @@ public class MouseController {
 
     // Nécessaire pour MouseMotionListener, mais non utilisé ici
     @Override
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+    }
   }
 
   public class ButtonEffect extends MouseAdapter {

@@ -4,9 +4,15 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import static java.awt.Image.SCALE_SMOOTH;
+import static java.awt.Font.PLAIN;
+import static java.awt.Font.BOLD;
+import java.awt.Font;
+
 
 public class OptionFrame extends JFrame {
 
@@ -34,11 +40,11 @@ public class OptionFrame extends JFrame {
     int width = 178;
     int height = 48;
     for (JButton button : buttons) {
-      button.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 16));
+      button.setFont(new java.awt.Font("Arial", PLAIN, 16));
       button.setHorizontalAlignment(SwingConstants.LEFT);
-      button.setPreferredSize(new java.awt.Dimension(width, height));
-      button.setMaximumSize(new java.awt.Dimension(width, height));
-      button.setMinimumSize(new java.awt.Dimension(width, height));
+      button.setPreferredSize(new Dimension(width, height));
+      button.setMaximumSize(new Dimension(width, height));
+      button.setMinimumSize(new Dimension(width, height));
     }
   }
 
@@ -49,7 +55,7 @@ public class OptionFrame extends JFrame {
     newProjetPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
 
     JLabel label = new JLabel("Welcome to Image Editor");
-    label.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
+    label.setFont(new Font("Arial", BOLD, 24));
     newProjet = new JButton("  new project");
     openProjet = new JButton("  open project");
     label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
@@ -59,8 +65,8 @@ public class OptionFrame extends JFrame {
     try {
       File folderIcon = new File("src/main/resources/Icon/folderIcon.png");
       File plusIcon = new File("src/main/resources/Icon/plusIcon.png");
-      Image folderImg = ImageIO.read(folderIcon).getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH);
-      Image plusImg = ImageIO.read(plusIcon).getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH);
+      Image folderImg = ImageIO.read(folderIcon).getScaledInstance(32, 32, SCALE_SMOOTH);
+      Image plusImg = ImageIO.read(plusIcon).getScaledInstance(32, 32, SCALE_SMOOTH);
       ImageIcon folderImage = new ImageIcon(folderImg);
       ImageIcon plusImage = new ImageIcon(plusImg);
       newProjet.setIcon(plusImage);

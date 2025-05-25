@@ -4,197 +4,198 @@ import com.upc.model.ImageEditorModel;
 import com.upc.view.ImageEditorView;
 import com.upc.view.DrawingPanel;
 
+import static javax.imageio.ImageIO.write;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
+
 public class ImageEditorController {
-    private ImageEditorModel model;
-    private ImageEditorView view;
-    private GUIController guiController;
-    private TransferController transferController;
-    private File imageDir;
-    private int cpt = 0;
-    private JPopupMenu thicknessPopup;
+  private ImageEditorModel model;
+  private ImageEditorView view;
+  private GUIController guiController;
+  private TransferController transferController;
+  private File imageDir;
+  private int cpt = 0;
+  private JPopupMenu thicknessPopup;
 
-    public ImageEditorController(TransferController transferController, File imageDir, GUIController guiController) {
-        this.model = new ImageEditorModel();
-        this.view = new ImageEditorView();
-        this.imageDir = imageDir;
-        this.transferController = transferController;
-        this.guiController = guiController;
-        initThicknessPopup();
-        initController();
+  public ImageEditorController(TransferController transferController, File imageDir, GUIController guiController) {
+    this.model = new ImageEditorModel();
+    this.view = new ImageEditorView();
+    this.imageDir = imageDir;
+    this.transferController = transferController;
+    this.guiController = guiController;
+    initThicknessPopup();
+    initController();
+  }
+
+  public ImageEditorModel getImageEditorModel() {
+    return model;
+  }
+
+  public ImageEditorView getImageEditPanel() {
+    return view;
+  }
+
+  private void initController() {
+    // Ajouter des actions aux boutons
+    for (Component component : view.getToolBarComponents()) { // Utiliser une méthode dédiée
+      if (component instanceof JButton) {
+        JButton button = (JButton) component;
+        button.addActionListener(e -> handleToolSelection(button));
+      }
     }
+  }
 
-    public ImageEditorModel getImageEditorModel() {
-        return model;
+  private void handleToolSelection(JButton button) {
+    String tool = button.getText();
+    if (tool == null || tool.isEmpty()) {
+      Icon icon = button.getIcon();
+      if (icon instanceof ImageIcon) {
+        tool = ((ImageIcon) icon).getDescription();
+      } else if (icon instanceof ColorIcon) {
+        tool = icon.toString();
+      }
     }
-
-    public ImageEditorView getImageEditPanel() {
-        return view;
-    }
-
-    private void initController() {
-        // Ajouter des actions aux boutons
-        for (Component component : view.getToolBarComponents()) { // Utiliser une méthode dédiée
-            if (component instanceof JButton) {
-                JButton button = (JButton) component;
-                button.addActionListener(e -> handleToolSelection(button));
+    switch (tool) {
+      case "Stylo":
+        model.setSelectedTool(0);
+        showThicknessPopup(button); // Afficher le popup
+        break;
+      case "Gomme":
+        model.setSelectedTool(1);
+        showThicknessPopup(button); // Afficher le popup
+        break;
+      case "Cercle":
+        model.setSelectedTool(2);
+        showThicknessPopup(button); // Afficher le popup
+        break;
+      case "Carré":
+        model.setSelectedTool(3);
+        showThicknessPopup(button); // Afficher le popup
+        break;
+      case "Couleur":
+        Color selectedColor = JColorChooser.showDialog(null, "Choisissez une couleur", null);
+        button.setIcon(new ColorIcon(selectedColor, 20, "Couleur"));
+        model.setSelectedColor(selectedColor);
+        break;
+      case "+":
+        DrawingPanel newPanel = new DrawingPanel();
+        DrawingController newController = new DrawingController(newPanel, model, transferController, imageDir);
+        newPanel.addMouseListener(newController);
+        newPanel.addMouseMotionListener(newController);
+        view.addDrawingPanel("Dessin " + (++cpt), newPanel);
+        break;
+      case "Clear":
+        JPanel selectedPanel = view.getSelectedDrawingPanel();
+        if (selectedPanel instanceof DrawingPanel) {
+          DrawingPanel drawingPanel = (DrawingPanel) selectedPanel;
+          if (!drawingPanel.isEmpty()) {
+            drawingPanel.clearAll();
+          } else {
+            int idx = view.getTabbedPane().getSelectedIndex();
+            if (idx != -1) {
+              view.getTabbedPane().removeTabAt(idx);
             }
+          }
         }
-    }
-
-    private void handleToolSelection(JButton button) {
-        String tool = button.getText();
-        if (tool == null || tool.isEmpty()) {
-            Icon icon = button.getIcon();
-            if (icon instanceof ImageIcon) {
-                tool = ((ImageIcon) icon).getDescription();
-            } else if (icon instanceof ColorIcon) {
-                tool = icon.toString();
+        break;
+      case "Valider":
+        JPanel selectedPanelValider = view.getSelectedDrawingPanel();
+        if (selectedPanelValider instanceof DrawingPanel) {
+          DrawingPanel drawingPanel = (DrawingPanel) selectedPanelValider;
+          // Récupérer le nom de l'onglet
+          int idx = view.getTabbedPane().getSelectedIndex();
+          if (idx != -1) {
+            String tabName = view.getTabbedPane().getTitleAt(idx);
+            // Nettoyer le nom pour éviter les caractères interdits dans un nom de fichier
+            String fileName = tabName.replaceAll("[^a-zA-Z0-9-_\\.]", "_") + ".png";
+            File outputFile = new File(imageDir, fileName);
+            try {
+              write(drawingPanel.getBufferedImage(), "png", outputFile);
+              showTemporaryMessage("Dessin sauvegardé sous : " + outputFile.getAbsolutePath());
+              // Actualiser la vue des images
+              guiController.updateViewPanel(outputFile.getAbsolutePath(), fileName);
+            } catch (Exception ex) {
+              JOptionPane.showMessageDialog(null, "Erreur lors de la sauvegarde : " + ex.getMessage());
             }
+          }
         }
-        switch (tool) {
-            case "Stylo":
-                model.setSelectedTool(0);
-                showThicknessPopup(button); // Afficher le popup
-                break;
-            case "Gomme":
-                model.setSelectedTool(1);
-                showThicknessPopup(button); // Afficher le popup
-                break;
-            case "Cercle":
-                model.setSelectedTool(2);
-                showThicknessPopup(button); // Afficher le popup
-                break;
-            case "Carré":
-                model.setSelectedTool(3);
-                showThicknessPopup(button); // Afficher le popup
-                break;
-            case "Couleur":
-                Color selectedColor = JColorChooser.showDialog(null, "Choisissez une couleur", null);
-                button.setIcon(new ColorIcon(selectedColor, 20, "Couleur"));
-                model.setSelectedColor(selectedColor);
-                break;
-            case "+":
-                DrawingPanel newPanel = new DrawingPanel();
-                DrawingController newController = new DrawingController(newPanel, model, transferController, imageDir);
-                newPanel.addMouseListener(newController);
-                newPanel.addMouseMotionListener(newController);
-                view.addDrawingPanel("Dessin " + (++cpt), newPanel);
-                break;
-            case "Clear":
-                JPanel selectedPanel = view.getSelectedDrawingPanel();
-                if (selectedPanel instanceof com.upc.view.DrawingPanel) {
-                    com.upc.view.DrawingPanel drawingPanel = (com.upc.view.DrawingPanel) selectedPanel;
-                    if (!drawingPanel.isEmpty()) {
-                        drawingPanel.clearAll();
-                    } else {
-                        int idx = view.getTabbedPane().getSelectedIndex();
-                        if (idx != -1) {
-                            view.getTabbedPane().removeTabAt(idx);
-                        }
-                    }
-                }
-                break;
-            case "Valider":
-                JPanel selectedPanelValider = view.getSelectedDrawingPanel();
-                if (selectedPanelValider instanceof DrawingPanel) {
-                    DrawingPanel drawingPanel = (DrawingPanel) selectedPanelValider;
-                    // Récupérer le nom de l'onglet
-                    int idx = view.getTabbedPane().getSelectedIndex();
-                    if (idx != -1) {
-                        String tabName = view.getTabbedPane().getTitleAt(idx);
-                        // Nettoyer le nom pour éviter les caractères interdits dans un nom de fichier
-                        String fileName = tabName.replaceAll("[^a-zA-Z0-9-_\\.]", "_") + ".png";
-                        File outputFile = new File(imageDir, fileName);
-                        try {
-                            javax.imageio.ImageIO.write(drawingPanel.getBufferedImage(), "png", outputFile);
-                            showTemporaryMessage("Dessin sauvegardé sous : " + outputFile.getAbsolutePath());
-                            // Actualiser la vue des images
-                            guiController.updateViewPanel(outputFile.getAbsolutePath(), fileName);
-                        } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(null, "Erreur lors de la sauvegarde : " + ex.getMessage());
-                        }
-                    }
-                }
-                break;
-        }
+        break;
+    }
+  }
+
+  private void showThicknessPopup(JButton button) {
+    // Obtenir la position du bouton
+    Point location = button.getLocationOnScreen();
+    thicknessPopup.show(button, 0, button.getHeight());
+  }
+
+  private void initThicknessPopup() {
+    thicknessPopup = new JPopupMenu();
+    JSlider thicknessSlider = new JSlider(0, 100, model.getStrokeWidth() + 1); // Min: 1, Max: 20
+    thicknessSlider.setPaintTicks(true);
+    thicknessSlider.setPaintLabels(true);
+    thicknessSlider.setMajorTickSpacing(20);
+    thicknessSlider.setMinorTickSpacing(10);
+
+    thicknessSlider.addChangeListener(e -> {
+      int thickness = thicknessSlider.getValue();
+      model.setStrokeWidth(thickness);
+    });
+
+    thicknessPopup.add(thicknessSlider);
+  }
+
+  // Classe pour dessiner une icône de couleur
+  public static class ColorIcon implements Icon {
+    private final int size;
+    private Color color;
+    private String description;
+
+    public ColorIcon(Color color, int size, String description) {
+      this.color = color;
+      this.size = size;
+      this.description = description;
     }
 
-    private void showThicknessPopup(JButton button) {
-        // Obtenir la position du bouton
-        Point location = button.getLocationOnScreen();
-        thicknessPopup.show(button, 0, button.getHeight());
+    public void setColor(Color color) {
+      this.color = color;
     }
 
-    
-    private void initThicknessPopup() {
-        thicknessPopup = new JPopupMenu();
-        JSlider thicknessSlider = new JSlider(0, 100, model.getStrokeWidth() + 1); // Min: 1, Max: 20
-        thicknessSlider.setPaintTicks(true);
-        thicknessSlider.setPaintLabels(true);
-        thicknessSlider.setMajorTickSpacing(20);
-        thicknessSlider.setMinorTickSpacing(10);
-
-        thicknessSlider.addChangeListener(e -> {
-            int thickness = thicknessSlider.getValue();
-            model.setStrokeWidth(thickness);
-        });
-
-        thicknessPopup.add(thicknessSlider);
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+      g.setColor(color);
+      g.fillOval(x, y, size, size); // Dessine un cercle rempli de la couleur
+      g.setColor(Color.BLACK);
+      g.drawOval(x, y, size - 1, size - 1); // Ajoute une bordure noire
     }
 
-    // Classe pour dessiner une icône de couleur
-    public static class ColorIcon implements Icon {
-        private final int size;
-        private Color color;
-        private String description;
-
-        public ColorIcon(Color color, int size, String description) {
-            this.color = color;
-            this.size = size;
-            this.description = description;
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-        }
-
-        @Override
-        public void paintIcon(Component c, Graphics g, int x, int y) {
-            g.setColor(color);
-            g.fillOval(x, y, size, size); // Dessine un cercle rempli de la couleur
-            g.setColor(Color.BLACK);
-            g.drawOval(x, y, size - 1, size - 1); // Ajoute une bordure noire
-        }
-
-        @Override
-        public int getIconWidth() {
-            return size;
-        }
-
-        @Override
-        public int getIconHeight() {
-            return size;
-        }
-
-        @Override
-        public String toString() {
-            return description; // Retourne la description de l'icône
-        }
+    @Override
+    public int getIconWidth() {
+      return size;
     }
 
-    // Affiche un message temporaire qui disparaît après 2 secondes
-    private void showTemporaryMessage(String message) {
-        JOptionPane pane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
-        JDialog dialog = pane.createDialog(null, "Information");
-        dialog.setModal(false); // Permet de ne pas bloquer l'UI
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setVisible(true);
-
-        // Timer pour fermer la fenêtre après 2 secondes (2000 ms)
-        new javax.swing.Timer(2000, e -> dialog.dispose()).start();
+    @Override
+    public int getIconHeight() {
+      return size;
     }
+
+    @Override
+    public String toString() {
+      return description; // Retourne la description de l'icône
+    }
+  }
+
+  // Affiche un message temporaire qui disparaît après 2 secondes
+  private void showTemporaryMessage(String message) {
+    JOptionPane pane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
+    JDialog dialog = pane.createDialog(null, "Information");
+    dialog.setModal(false); // Permet de ne pas bloquer l'UI
+    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    dialog.setVisible(true);
+
+    // Timer pour fermer la fenêtre après 2 secondes (2000 ms)
+    new Timer(2000, e -> dialog.dispose()).start();
+  }
 }

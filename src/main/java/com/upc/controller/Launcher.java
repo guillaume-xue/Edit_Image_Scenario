@@ -33,7 +33,6 @@ public class Launcher {
 
     timer.setRepeats(false);
     timer.start();
-
   }
 
   private static JWindow creerSplashScreen() {

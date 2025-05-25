@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import static java.nio.file.Files.readAllBytes;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -43,7 +44,7 @@ public class TimeLinePanelController {
       protected Void doInBackground() {
         String scenarioContent;
         try {
-          scenarioContent = new String(java.nio.file.Files.readAllBytes(scenario.toPath()));
+          scenarioContent = new String(readAllBytes(scenario.toPath()));
         } catch (java.io.IOException e) {
           e.printStackTrace();
           return null; // Exit if the file cannot be read
