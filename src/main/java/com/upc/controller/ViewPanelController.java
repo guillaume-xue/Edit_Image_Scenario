@@ -25,15 +25,34 @@ import com.upc.view.ImportButton;
 import com.upc.view.MainFrame;
 import com.upc.view.ViewPanel;
 
+/**
+ * Contrôleur principal pour la gestion de l'affichage et de l'importation des images
+ * dans le panneau de visualisation.
+ */
 public class ViewPanelController {
 
+  // Référence au panneau de vue principal
   private ViewPanel viewPanel;
+  // Référence à la fenêtre principale de l'application
   private MainFrame mainFrame;
+  // Contrôleur pour la gestion du drag & drop
   private TransferController transferController;
+  // Contrôleur pour la gestion des événements souris
   private MouseController mouseController;
+  // Bouton d'importation personnalisé
   private ImportButton importButton;
+  // Dialogue de chargement (affiché lors du chargement des images)
   private JDialog loadingDialog;
 
+  /**
+   * Constructeur du contrôleur du panneau de vue.
+   * @param viewPanel panneau de visualisation des images
+   * @param mainFrame fenêtre principale
+   * @param transferController gestionnaire de transfert (drag & drop)
+   * @param mouseController gestionnaire des événements souris
+   * @param imageDirectory répertoire des images à afficher
+   * @param loadingDialog dialogue de chargement
+   */
   public ViewPanelController(ViewPanel viewPanel, MainFrame mainFrame,
       TransferController transferController, MouseController mouseController, String imageDirectory,
       JDialog loadingDialog) {
@@ -47,6 +66,12 @@ public class ViewPanelController {
     initActionListener(imageDirectory);
   }
 
+  /**
+   * Ajoute un panneau d'affichage d'image à partir d'un chemin et d'une description.
+   * Redimensionne l'image pour l'adapter à l'affichage.
+   * @param pathIcon chemin de l'image
+   * @param descriptionIcon description de l'image (nom)
+   */
   private void addImageViewPanel(String pathIcon, String descriptionIcon) {
     // Charge et redimensionne l'image AVANT de créer l'ImageIcon
     ImageIcon tempIcon = new ImageIcon(pathIcon);
@@ -67,6 +92,9 @@ public class ViewPanelController {
     updateMainPanelSize();
   }
 
+  /**
+   * Met à jour dynamiquement la taille du panneau principal en fonction du nombre d'images.
+   */
   private void updateMainPanelSize() {
     int count = viewPanel.getMainPanel().getComponentCount();
     int width = Math.max(1, viewPanel.getMainPanel().getWidth() / 130);
@@ -78,6 +106,11 @@ public class ViewPanelController {
     viewPanel.getScrollPane().repaint();
   }
 
+  /**
+   * Initialise le panneau de vue avec les images du répertoire spécifié.
+   * Utilise un SwingWorker pour éviter de bloquer l'interface graphique.
+   * @param imageDirectory répertoire contenant les images à afficher
+   */
   public void initViewPanel(String imageDirectory) {
 
     File directory = new File(imageDirectory);
@@ -131,6 +164,9 @@ public class ViewPanelController {
     }
   }
 
+  /**
+   * Affiche le bouton d'importation si aucun composant n'est présent dans le panneau principal.
+   */
   public void emptyViewPanel() {
     if (viewPanel.getMainPanel().getComponentCount() == 0) {
       viewPanel.getMainPanel().setLayout(new BorderLayout());
@@ -140,6 +176,9 @@ public class ViewPanelController {
     }
   }
 
+  /**
+   * Initialise les écouteurs de souris pour le bouton d'importation et le redimensionnement du panneau.
+   */
   public void initMouseListener() {
     importButton.addMouseListener(mouseController.new ButtonEffect(importButton));
     viewPanel.getMainPanel().addComponentListener(new ComponentAdapter() {
@@ -150,6 +189,10 @@ public class ViewPanelController {
     });
   }
 
+  /**
+   * Initialise les écouteurs d'action pour les boutons d'importation.
+   * @param imageDirectory répertoire cible pour l'importation
+   */
   public void initActionListener(String imageDirectory) {
     viewPanel.getImportButton().addActionListener(e -> {
       ActionImport(imageDirectory);
@@ -159,6 +202,9 @@ public class ViewPanelController {
     });
   }
 
+  /**
+   * Retire le bouton d'importation du panneau principal si présent.
+   */
   public void removeImportButton() {
     if (viewPanel.getMainPanel().getComponent(0) instanceof ImportButton) {
       viewPanel.getMainPanel().removeAll();
@@ -166,6 +212,10 @@ public class ViewPanelController {
     }
   }
 
+  /**
+   * Retire un panneau d'image spécifique du panneau principal.
+   * @param imageViewPanel panneau à retirer
+   */
   public void removeImageViewPanel(ImageViewPanel imageViewPanel) {
     viewPanel.getMainPanel().remove(imageViewPanel);
     emptyViewPanel();
@@ -174,6 +224,11 @@ public class ViewPanelController {
     viewPanel.getMainPanel().repaint();
   }
 
+  /**
+   * Action d'importation d'une image via un JFileChooser.
+   * Copie l'image sélectionnée dans le répertoire cible et l'affiche.
+   * @param imageDirectory répertoire cible
+   */
   private void ActionImport(String imageDirectory) {
     JFileChooser fileChooser = new JFileChooser(); // Set default directory
     FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -197,33 +252,38 @@ public class ViewPanelController {
     viewPanel.getMainPanel().repaint();
   }
 
+  /**
+   * Ajoute une image ou met à jour une image existante dans le panneau principal.
+   * @param imagePath chemin de l'image
+   * @param imageName nom de l'image
+   */
   public void addOrUpdateImage(String imagePath, String imageName) {
     boolean found = false;
     for (Component comp : viewPanel.getMainPanel().getComponents()) {
-        if (comp instanceof com.upc.view.ImageViewPanel) {
-            ImageViewPanel panel = (ImageViewPanel) comp;
-            ImageIcon icon = panel.getImageIcon();
-            if (icon != null && imageName.equals(icon.getDescription())) {
-                // Actualiser l'image (remplacer l'icône)
-                ImageIcon newIcon = new ImageIcon(imagePath);
-                int maxW = 120, maxH = 80;
-                int iw = newIcon.getIconWidth(), ih = newIcon.getIconHeight();
-                double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
-                int w = (int) (iw * ratio), h = (int) (ih * ratio);
-                Image scaled = newIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-                newIcon.getImage().flush();
-                ImageIcon scaledIcon = new ImageIcon(scaled);
-                scaledIcon.setDescription(imageName);
-                panel.setImageIcon(scaledIcon);
-                panel.repaint();
-                found = true;
-                break;
-            }
+      if (comp instanceof com.upc.view.ImageViewPanel) {
+        ImageViewPanel panel = (ImageViewPanel) comp;
+        ImageIcon icon = panel.getImageIcon();
+        if (icon != null && imageName.equals(icon.getDescription())) {
+          // Actualiser l'image (remplacer l'icône)
+          ImageIcon newIcon = new ImageIcon(imagePath);
+          int maxW = 120, maxH = 80;
+          int iw = newIcon.getIconWidth(), ih = newIcon.getIconHeight();
+          double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
+          int w = (int) (iw * ratio), h = (int) (ih * ratio);
+          Image scaled = newIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+          newIcon.getImage().flush();
+          ImageIcon scaledIcon = new ImageIcon(scaled);
+          scaledIcon.setDescription(imageName);
+          panel.setImageIcon(scaledIcon);
+          panel.repaint();
+          found = true;
+          break;
         }
+      }
     }
     if (!found) {
-        // Si non trouvé, on ajoute
-        addImageViewPanel(imagePath, imageName);
+      // Si non trouvé, on ajoute
+      addImageViewPanel(imagePath, imageName);
     }
     viewPanel.getMainPanel().revalidate();
     viewPanel.getMainPanel().repaint();

@@ -17,6 +17,11 @@ import com.upc.view.DividerPanel;
 import com.upc.view.ResizablePanel;
 import com.upc.view.TimeLinePanel;
 
+/**
+ * Contrôleur de la timeline.
+ * Gère l'ajout, la suppression, le déplacement et le redimensionnement des images sur la timeline.
+ * Permet également le zoom et la synchronisation avec la vue.
+ */
 public class TimeLinePanelController {
 
   private TimeLinePanel timeLinePanel;
@@ -24,6 +29,13 @@ public class TimeLinePanelController {
   private MouseController mouseController;
   private JDialog loadingDialog;
 
+  /**
+   * Constructeur du contrôleur de la timeline.
+   * @param timeLinePanel panneau de la timeline
+   * @param transferController contrôleur de transfert
+   * @param mouseController contrôleur souris
+   * @param loadingDialog fenêtre de chargement
+   */
   public TimeLinePanelController(TimeLinePanel timeLinePanel, TransferController transferController,
       MouseController mouseController, JDialog loadingDialog) {
     this.timeLinePanel = timeLinePanel;
@@ -34,6 +46,11 @@ public class TimeLinePanelController {
     this.timeLinePanel.getZoomOutButton().addActionListener(e -> zoomOut());
   }
 
+  /**
+   * Initialise la timeline à partir d'un fichier scénario et d'un dossier images.
+   * @param scenario fichier scénario
+   * @param imageDirectory dossier images
+   */
   public void initTimeLinePanel(File scenario, File imageDirectory) {
     if (scenario == null || !scenario.exists()) {
       return; // Scenario file does not exist
@@ -104,6 +121,9 @@ public class TimeLinePanelController {
     }.execute();
   }
 
+  /**
+   * Zoom avant sur la timeline.
+   */
   public void zoomIn() {
     double current = timeLinePanel.getZoomFactor();
     if (current < 5.0) { // Limite max de zoom
@@ -112,6 +132,9 @@ public class TimeLinePanelController {
     }
   }
 
+  /**
+   * Zoom arrière sur la timeline.
+   */
   public void zoomOut() {
     double current = timeLinePanel.getZoomFactor();
     if (current > 0.2) { // Limite min de zoom
@@ -120,12 +143,20 @@ public class TimeLinePanelController {
     }
   }
 
+  /**
+   * Synchronise la position du scroll horizontal après un zoom.
+   */
   private void syncScroll() {
     JScrollBar hBar = timeLinePanel.getScrollPane().getHorizontalScrollBar();
     int value = hBar.getValue();
     hBar.setValue(value); // Force la synchro de la position
   }
 
+  /**
+   * Ajoute une image à la timeline avec une durée donnée.
+   * @param imageIcon image à ajouter
+   * @param duration durée d'affichage
+   */
   public void addImageLabel(ImageIcon imageIcon, int duration) {
     ResizablePanel resizablePanel = new ResizablePanel(imageIcon, duration);
     double zoom = timeLinePanel.getZoomFactor();
@@ -148,6 +179,10 @@ public class TimeLinePanelController {
     timeLinePanel.updateEndMarginPanel();
   }
 
+  /**
+   * Supprime une image de la timeline.
+   * @param resizablePanel panneau à supprimer
+   */
   public void removeImageLabel(ResizablePanel resizablePanel) {
     currentDividerPanel = removeImageLabelRecursive(currentDividerPanel, resizablePanel);
     if (currentDividerPanel == null) {
@@ -158,6 +193,9 @@ public class TimeLinePanelController {
     timeLinePanel.updateEndMarginPanel();
   }
 
+  /**
+   * Méthode récursive pour supprimer un panneau de la chaîne de dividers.
+   */
   private DividerPanel removeImageLabelRecursive(DividerPanel divider, ResizablePanel resizablePanel) {
     if (divider == null) {
       return null;
@@ -174,6 +212,10 @@ public class TimeLinePanelController {
     }
   }
 
+  /**
+   * Retourne la liste des images et durées présentes sur la timeline.
+   * @return liste des couples (ImageIcon, durée)
+   */
   public ArrayList<Map.Entry<ImageIcon, Integer>> getImageCopiesWithDurations() {
     ArrayList<Map.Entry<ImageIcon, Integer>> imageCopiesWithDurations = new ArrayList<>();
     DividerPanel tmp = currentDividerPanel;
@@ -193,11 +235,18 @@ public class TimeLinePanelController {
     return imageCopiesWithDurations;
   }
 
+  /**
+   * Retourne le panneau de la timeline.
+   */
   public TimeLinePanel getTimeLinePanel() {
     return timeLinePanel;
   }
 
-  // Déplacer la scène à une position absolue (0 = début, -1 = fin)
+  /**
+   * Déplace un panneau à une position absolue (0 = début, -1 = fin).
+   * @param panel panneau à déplacer
+   * @param index position cible
+   */
   public void moveResizablePanelTo(ResizablePanel panel, int index) {
     JPanel scene = timeLinePanel.getTimeLinePanel();
     List<ResizablePanel> panels = new ArrayList<>();
@@ -237,7 +286,11 @@ public class TimeLinePanelController {
     timeLinePanel.repaint();
   }
 
-  // Déplacer la scène d'un pas relatif (+1 = avancer, -1 = reculer)
+  /**
+   * Déplace un panneau d'un pas relatif (+1 = avancer, -1 = reculer).
+   * @param panel panneau à déplacer
+   * @param delta déplacement relatif
+   */
   public void moveResizablePanelRelative(ResizablePanel panel, int delta) {
     JPanel scene = timeLinePanel.getTimeLinePanel();
     List<ResizablePanel> panels = new ArrayList<>();

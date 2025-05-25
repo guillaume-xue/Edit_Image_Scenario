@@ -1,20 +1,33 @@
 package com.upc.view;
 
-import javax.swing.*;
-import java.awt.*;
 import com.upc.controller.ImageEditorController.ColorIcon;
+
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+
+import javax.swing.*;
 import static javax.swing.SwingUtilities.convertPoint;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 
+/**
+ * Vue principale de l'éditeur d'image.
+ * Gère la barre d'outils, les onglets de dessins et l'interface utilisateur associée.
+ */
 public class ImageEditorView extends JPanel {
+  // Barre d'outils horizontale
   private JToolBar toolBar;
+  // Onglets pour les différents panneaux de dessin
   private JTabbedPane tabbedPane;
+  // Curseur pour l'épaisseur du trait (non initialisé ici)
   private JSlider thicknessSlider;
 
+  /**
+   * Constructeur de la vue éditeur d'image.
+   * Initialise la disposition et les composants principaux.
+   */
   public ImageEditorView() {
     super();
     setLayout(new BorderLayout());
@@ -27,6 +40,9 @@ public class ImageEditorView extends JPanel {
     initView();
   }
 
+  /**
+   * Initialise la barre d'outils avec les boutons principaux de l'éditeur.
+   */
   private void initView() {
     // Ajouter les boutons à la barre d'outils
     JButton add = new JButton("+");
@@ -63,11 +79,6 @@ public class ImageEditorView extends JPanel {
     clearButton.setMaximumSize(new Dimension(30, 30));
     clearButton.setPreferredSize(new Dimension(30, 30));
     clearButton.setIcon(resizeImageIcon("src/main/resources/Icon/effacer.png", "Clear", 20, 20));
-    JButton validateButton = new JButton();
-    validateButton.setMinimumSize(new Dimension(30, 30));
-    validateButton.setMaximumSize(new Dimension(30, 30));
-    validateButton.setPreferredSize(new Dimension(30, 30));
-    validateButton.setIcon(resizeImageIcon("src/main/resources/Icon/verifier.png", "Valider", 20, 20));
 
     addToolBarButton(add);
     addToolBarButton(penButton);
@@ -76,10 +87,17 @@ public class ImageEditorView extends JPanel {
     addToolBarButton(squareButton);
     addToolBarButton(colorButton);
     addToolBarButton(clearButton);
-    addToolBarButton(validateButton);
 
   }
 
+  /**
+   * Redimensionne et retourne une ImageIcon à partir d'un chemin.
+   * @param path chemin de l'image
+   * @param description description de l'icône
+   * @param width largeur cible
+   * @param height hauteur cible
+   * @return ImageIcon redimensionnée
+   */
   public ImageIcon resizeImageIcon(String path, String description, int width, int height) {
     ImageIcon tempIcon = new ImageIcon(path);
     int maxW = width, maxH = height;
@@ -94,39 +112,75 @@ public class ImageEditorView extends JPanel {
     return scaledIcon;
   }
 
+  /**
+   * Ajoute un bouton à la barre d'outils.
+   * @param button bouton à ajouter
+   */
   public void addToolBarButton(JButton button) {
     toolBar.add(button);
   }
 
+  /**
+   * Ajoute un panneau de dessin sous forme d'onglet.
+   * @param title titre de l'onglet
+   * @param panel panneau de dessin à ajouter
+   */
   public void addDrawingPanel(String title, JPanel panel) {
     tabbedPane.addTab(title, panel);
     int index = tabbedPane.indexOfComponent(panel);
     tabbedPane.setTabComponentAt(index, new ClosableTabComponent(tabbedPane, index));
   }
 
+  /**
+   * Retourne le panneau de dessin actuellement sélectionné.
+   * @return JPanel sélectionné
+   */
   public JPanel getSelectedDrawingPanel() {
     return (JPanel) tabbedPane.getSelectedComponent();
   }
 
+  /**
+   * Retourne les composants de la barre d'outils.
+   * @return tableau de composants
+   */
   public Component[] getToolBarComponents() {
     return toolBar.getComponents();
   }
 
+  /**
+   * Retourne le curseur d'épaisseur.
+   * @return JSlider d'épaisseur
+   */
   public JSlider getThicknessSlider() {
     return thicknessSlider;
   }
 
+  /**
+   * Retourne le composant JTabbedPane.
+   * @return JTabbedPane
+   */
   public JTabbedPane getTabbedPane() {
     return tabbedPane;
   }
 
+  /**
+   * Composant personnalisé pour les onglets avec possibilité de modification du titre par double-clic.
+   */
   public class ClosableTabComponent extends JPanel {
+    // Bouton de fermeture (non utilisé ici)
     private JButton closeButton;
+    // Label affichant le titre de l'onglet
     private JLabel titleLabel;
 
+    // Timer pour différencier simple et double clic
     private Timer singleClickTimer;
     private final int DOUBLE_CLICK_DELAY = 100; // ms
 
+    /**
+     * Constructeur du composant d'onglet personnalisable.
+     * @param tabbedPane le JTabbedPane parent
+     * @param index index de l'onglet
+     */
     public ClosableTabComponent(JTabbedPane tabbedPane, int index) {
       super(new FlowLayout(FlowLayout.LEFT, 0, 0));
       setOpaque(false);
@@ -134,7 +188,7 @@ public class ImageEditorView extends JPanel {
       titleLabel = new JLabel(tabbedPane.getTitleAt(index));
       add(titleLabel);
 
-      // Edition directe du nom d'onglet
+      // Edition directe du nom d'onglet par double-clic
       titleLabel.addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -181,6 +235,12 @@ public class ImageEditorView extends JPanel {
       });
     }
 
+    /**
+     * Finalise l'édition du titre d'onglet (validation ou perte de focus).
+     * @param tabbedPane le JTabbedPane parent
+     * @param tabIndex index de l'onglet
+     * @param textField champ de saisie temporaire
+     */
     private void finishEdit(JTabbedPane tabbedPane, int tabIndex, JTextField textField) {
       String newTitle = textField.getText().trim();
       if (!newTitle.isEmpty()) {
@@ -193,6 +253,10 @@ public class ImageEditorView extends JPanel {
       repaint();
     }
 
+    /**
+     * Retourne le bouton de fermeture (non utilisé ici).
+     * @return JButton de fermeture
+     */
     public JButton geButtontCloseButton() {
       return closeButton;
     }

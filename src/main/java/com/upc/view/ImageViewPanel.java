@@ -1,22 +1,37 @@
 package com.upc.view;
 
 import javax.swing.*;
+
 import java.awt.*;
 
+/**
+ * Panneau personnalisé pour afficher une image avec coins arrondis et contour.
+ * Utilisé pour présenter les images dans une galerie ou une liste.
+ */
 public class ImageViewPanel extends JPanel {
 
+  // Image à afficher dans le panneau
   private ImageIcon imageIcon;
 
+  /**
+   * Constructeur du panneau d'image.
+   * @param imageIcon ImageIcon à afficher
+   */
   public ImageViewPanel(ImageIcon imageIcon) {
     this.imageIcon = imageIcon;
-    this.setPreferredSize(new Dimension(120, 80)); // Set preferred size for the panel
-    this.setMinimumSize(new Dimension(120, 80)); // Set minimum size for the panel
-    this.setMaximumSize(new Dimension(120, 80)); // Set maximum size for the panel
-    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Set layout manager
-    this.add(Box.createHorizontalStrut(10));
-    setOpaque(false);
+    this.setPreferredSize(new Dimension(120, 80)); // Taille préférée du panneau
+    this.setMinimumSize(new Dimension(120, 80));   // Taille minimale
+    this.setMaximumSize(new Dimension(120, 80));   // Taille maximale
+    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Gestionnaire de layout vertical
+    this.add(Box.createHorizontalStrut(10)); // Espace horizontal
+    setOpaque(false); // Fond transparent
   }
 
+  /**
+   * Redéfinition de la méthode de dessin du composant.
+   * Affiche l'image centrée dans un rectangle arrondi avec un contour.
+   * @param g contexte graphique
+   */
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
@@ -41,6 +56,7 @@ public class ImageViewPanel extends JPanel {
       int imgWidth = imageIcon.getIconWidth();
       int imgHeight = imageIcon.getIconHeight();
 
+      // Calcul du ratio pour conserver les proportions de l'image
       double imgRatio = (double) imgWidth / imgHeight;
       double panelRatio = (double) w / h;
 
@@ -53,6 +69,7 @@ public class ImageViewPanel extends JPanel {
         drawHeight = (int) (drawWidth / imgRatio);
       }
 
+      // Centrer l'image dans le panneau
       int x = (w - drawWidth) / 2;
       int y = (h - drawHeight) / 2;
 
@@ -70,10 +87,18 @@ public class ImageViewPanel extends JPanel {
     g2.dispose();
   }
 
+  /**
+   * Retourne l'ImageIcon affichée.
+   * @return ImageIcon courante
+   */
   public ImageIcon getImageIcon() {
     return imageIcon;
   }
 
+  /**
+   * Modifie l'image affichée et redessine le panneau.
+   * @param imageIcon nouvelle ImageIcon à afficher
+   */
   public void setImageIcon(ImageIcon imageIcon) {
     this.imageIcon = imageIcon;
     repaint();

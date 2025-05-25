@@ -7,8 +7,15 @@ import com.upc.view.ImageViewPanel;
 import java.awt.*;
 import java.awt.datatransfer.*;
 
+/**
+ * Contrôleur pour la gestion du drag & drop (transfert d'images) entre les différents panneaux.
+ * Permet le transfert d'images entre la timeline, le panneau de dessin et la vue des images.
+ */
 public class TransferController {
 
+  /**
+   * Handler pour le transfert d'images vers la timeline.
+   */
   public class TransferTimeLine extends TransferHandler {
 
     private TimeLinePanelController timeLinePanel;
@@ -32,7 +39,7 @@ public class TransferController {
             (Image) support.getTransferable().getTransferData(DataFlavor.imageFlavor));
         String description = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
         imageIcon.setDescription(description);
-        timeLinePanel.addImageLabel(imageIcon, 100); // Add the vertical box to the timeLinePanel
+        timeLinePanel.addImageLabel(imageIcon, 100); // Ajoute l'image à la timeline
         return true;
       } catch (UnsupportedFlavorException | java.io.IOException e) {
         e.printStackTrace();
@@ -41,6 +48,9 @@ public class TransferController {
     }
   }
 
+  /**
+   * Handler pour le transfert d'images vers le panneau de dessin.
+   */
   public class TransferDrawing extends TransferHandler {
 
     private DrawingController drawingController;
@@ -73,7 +83,9 @@ public class TransferController {
     }
   }
 
-  // Classe pour gérer le transfert d'images
+  /**
+   * Handler pour le transfert d'images depuis la vue des images (drag).
+   */
   public class TransferViewPanel extends TransferHandler {
     @Override
     protected Transferable createTransferable(JComponent c) {
@@ -98,7 +110,9 @@ public class TransferController {
     }
   }
 
-  // Classe pour rendre ImageIcon transférable
+  /**
+   * Classe utilitaire pour rendre un ImageIcon transférable (drag & drop).
+   */
   class ImageIconTransferable implements Transferable {
     private final Image image;
     private final String description;

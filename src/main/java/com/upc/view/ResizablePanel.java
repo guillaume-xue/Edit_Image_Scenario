@@ -10,14 +10,26 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * Panneau redimensionnable utilisé dans la timeline pour représenter une séquence ou une image.
+ * Permet d'ajuster dynamiquement sa largeur (donc sa durée) et d'afficher une icône répétée.
+ */
 public class ResizablePanel extends JPanel {
 
+  // Label affichant la durée de la séquence
   private JLabel durationLabel;
+  // Icône associée à la séquence
   private ImageIcon icon;
+  // Facteur de zoom pour la conversion durée <-> largeur
   private double zoomFactor = 1.0;
-  private int duration = 0; // durée réelle en ms (ou px selon votre logique)
-  private TimeLinePanel parentTimeLinePanel; // Ajouté
+  // Durée réelle de la séquence (en ms ou px selon la logique)
+  private int duration = 0;
+  // Référence au panneau parent de la timeline
+  private TimeLinePanel parentTimeLinePanel;
 
+  /**
+   * Constructeur par défaut (sans icône ni durée).
+   */
   public ResizablePanel() {
     setBackground(Color.WHITE);
     setPreferredSize(new Dimension(100, 100));
@@ -26,6 +38,11 @@ public class ResizablePanel extends JPanel {
     add(durationLabel);
   }
 
+  /**
+   * Constructeur avec icône et durée initiale.
+   * @param icon icône à afficher
+   * @param duration durée de la séquence
+   */
   public ResizablePanel(ImageIcon icon, int duration) {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -47,6 +64,10 @@ public class ResizablePanel extends JPanel {
     add(Box.createHorizontalStrut(40));
   }
 
+  /**
+   * Redéfinition du rendu du composant.
+   * Affiche l'icône répétée horizontalement selon la largeur du panneau.
+   */
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
@@ -63,6 +84,10 @@ public class ResizablePanel extends JPanel {
     }
   }
 
+  /**
+   * Définit la durée à partir d'une chaîne de caractères.
+   * @param durationStr chaîne représentant la durée
+   */
   public void setDuration(String durationStr) {
     try {
       int d = Integer.parseInt(durationStr);
@@ -72,10 +97,18 @@ public class ResizablePanel extends JPanel {
     }
   }
 
+  /**
+   * Définit le panneau parent de la timeline.
+   * @param parent panneau parent
+   */
   public void setParentTimeLinePanel(TimeLinePanel parent) {
     this.parentTimeLinePanel = parent;
   }
 
+  /**
+   * Définit la durée et met à jour la largeur du panneau.
+   * @param duration nouvelle durée
+   */
   public void setDuration(int duration) {
     this.duration = duration;
     this.durationLabel.setText(Integer.toString(duration));
@@ -85,23 +118,41 @@ public class ResizablePanel extends JPanel {
     }
   }
 
+  /**
+   * Retourne la durée courante.
+   * @return durée
+   */
   public int getDuration() {
     return duration;
   }
 
+  /**
+   * Retourne l'icône associée.
+   * @return ImageIcon
+   */
   public ImageIcon getIcon() {
     return icon;
   }
 
+  /**
+   * Définit le facteur de zoom.
+   * @param zoomFactor nouveau facteur de zoom
+   */
   public void setZoomFactor(double zoomFactor) {
     this.zoomFactor = zoomFactor;
   }
 
+  /**
+   * Retourne le facteur de zoom courant.
+   * @return facteur de zoom
+   */
   public double getZoomFactor() {
     return zoomFactor;
   }
 
-  // Appelée lors du drag/redimensionnement
+  /**
+   * Met à jour la durée en fonction de la largeur du panneau (utilisé lors du redimensionnement).
+   */
   public void updateDurationFromWidth() {
     int width = getWidth();
     int newDuration = (int) (width / zoomFactor);
@@ -109,12 +160,19 @@ public class ResizablePanel extends JPanel {
     this.durationLabel.setText(Integer.toString(newDuration));
   }
 
+  /**
+   * Met à jour la durée en fonction de la largeur et du facteur de zoom fourni.
+   * @param zoomFactor facteur de zoom à utiliser
+   */
   public void updateDurationFromWidth(double zoomFactor) {
     this.zoomFactor = zoomFactor;
     updateDurationFromWidth();
   }
 
-  // Appelée lors du zoom ou de la création
+  /**
+   * Met à jour la largeur du panneau en fonction de la durée et du facteur de zoom.
+   * @param zoomFactor facteur de zoom à utiliser
+   */
   public void updateWidthFromDuration(double zoomFactor) {
     this.zoomFactor = zoomFactor;
     int width = (int) (duration * zoomFactor);
@@ -126,6 +184,10 @@ public class ResizablePanel extends JPanel {
     repaint();
   }
 
+  /**
+   * Retourne le panneau parent de la timeline.
+   * @return TimeLinePanel parent
+   */
   public TimeLinePanel getParentTimeLinePanel() {
     return parentTimeLinePanel;
   }

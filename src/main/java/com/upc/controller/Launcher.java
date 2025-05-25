@@ -7,6 +7,7 @@ import javax.swing.JRootPane;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -15,26 +16,36 @@ import java.awt.GraphicsEnvironment;
 
 import static java.awt.GraphicsDevice.WindowTranslucency.*;
 
+/**
+ * Classe de lancement de l'application.
+ * Affiche un splash screen au démarrage puis lance le contrôleur principal.
+ */
 public class Launcher {
 
+  /**
+   * Constructeur : affiche le splash screen puis lance l'application principale.
+   */
   public Launcher() {
     // Créer et afficher le splash screen
     JWindow splashScreen = creerSplashScreen();
     splashScreen.setVisible(true);
 
-    // Programmer le lancement de la fenêtre principale après 3 secondes
+    // Programmer le lancement de la fenêtre principale après 1 seconde
     Timer timer = new Timer(1000, e -> {
       // Ajouter l'effet de fondu avant de fermer
       fadeOut(splashScreen);
       new GUIController();
       splashScreen.dispose();
-
     });
 
     timer.setRepeats(false);
     timer.start();
   }
 
+  /**
+   * Crée et configure la fenêtre du splash screen.
+   * @return la fenêtre splash screen
+   */
   private static JWindow creerSplashScreen() {
     JWindow window = new JWindow();
     JRootPane rootPane = window.getRootPane();
@@ -58,6 +69,10 @@ public class Launcher {
     return window;
   }
 
+  /**
+   * Applique un effet de fondu lors de la fermeture du splash screen.
+   * @param window la fenêtre à faire disparaître en fondu
+   */
   private static void fadeOut(JWindow window) {
     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     GraphicsDevice gd = ge.getDefaultScreenDevice();

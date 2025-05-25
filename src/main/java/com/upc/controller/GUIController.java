@@ -24,29 +24,45 @@ import com.upc.view.OptionFrame;
 import com.upc.view.TimeLinePanel;
 import com.upc.view.ViewPanel;
 
+/**
+ * Contrôleur principal de l'application graphique.
+ * Gère l'initialisation des vues, la navigation entre projets, la sauvegarde et le chargement,
+ * ainsi que la coordination entre les différents contrôleurs de l'application.
+ */
 public class GUIController {
 
+  // Références aux différentes fenêtres de l'application
   private MainFrame mainFrame;
   private OptionFrame optionFrame;
   private NewProjetFrame newProjetFrame;
 
+  // Contrôleur d'édition d'image
   private ImageEditorController imageEditor;
 
+  // Autres contrôleurs nécessaires à l'application
   private TransferController transferController;
   private MouseController mouseController;
   private TimeLinePanelController timeLinePanelController;
   private ViewPanelController viewPanelController;
   private AnimaViewPanelController animaViewPanelController;
 
+  // Fichiers et dossiers du projet courant
   private File currentFile;
   private File imageDir;
   private File propertiesFile;
   private File scenarioFile;
 
+  /**
+   * Constructeur du contrôleur principal.
+   * Lance l'initialisation de l'écran d'options.
+   */
   public GUIController() {
     initOption();
   }
 
+  /**
+   * Initialise la fenêtre d'options (nouveau projet ou ouvrir projet existant).
+   */
   private void initOption() {
     // Créer un nouveau projet
     optionFrame = new OptionFrame();
@@ -54,12 +70,19 @@ public class GUIController {
     optionFrame.launch();
   }
 
+  /**
+   * Initialise la fenêtre de création de nouveau projet.
+   */
   private void initNewProjet() {
     newProjetFrame = new NewProjetFrame();
     newProjetFrame.launch();
     initNewProjetFrameListener();
   }
 
+  /**
+   * Initialise la fenêtre principale et tous les contrôleurs associés.
+   * Affiche un dialogue de chargement pendant l'initialisation.
+   */
   private void initMainFrame() {
     Properties properties = new Properties();
 
@@ -102,32 +125,41 @@ public class GUIController {
     }
   }
 
+  /**
+   * Initialise la structure du dossier projet (images, properties, scenario).
+   * Crée les dossiers/fichiers s'ils n'existent pas.
+   */
   private void initProjectFolder() {
     imageDir = new File(currentFile, "images");
     propertiesFile = new File(currentFile, "resources.properties");
     scenarioFile = new File(currentFile, "scenario.txt");
     if (!currentFile.exists()) {
-      currentFile.mkdirs(); // Create the directory if it doesn't exist
+      currentFile.mkdirs(); // Crée le dossier projet si inexistant
     }
     if (!imageDir.exists()) {
-      imageDir.mkdirs(); // Create the image directory if it doesn't exist
+      imageDir.mkdirs(); // Crée le dossier images si inexistant
     }
     if (!propertiesFile.exists()) {
       try {
-        propertiesFile.createNewFile(); // Create the properties file if it doesn't exist
+        propertiesFile.createNewFile(); // Crée le fichier properties si inexistant
       } catch (IOException ex) {
         ex.printStackTrace();
       }
     }
     if (!scenarioFile.exists()) {
       try {
-        scenarioFile.createNewFile(); // Create the scenario file if it doesn't exist
+        scenarioFile.createNewFile(); // Crée le fichier scenario si inexistant
       } catch (IOException ex) {
         ex.printStackTrace();
       }
     }
   }
 
+  /**
+   * Ouvre un dossier projet existant ou en crée un nouveau selon le paramètre.
+   * Vérifie la validité de la structure du dossier.
+   * @param isNewProject true si ouverture dans le cadre d'un nouveau projet
+   */
   private void openFolder(boolean isNewProject) {
     while (true) {
       JFileChooser fileChooser = new JFileChooser();
@@ -147,8 +179,8 @@ public class GUIController {
             mainFrame.dispose();
           }
           currentFile = selectedDir;
-          initProjectFolder(); // Initialize the project folder
-          initMainFrame(); // Initialize the main frame
+          initProjectFolder(); // Initialise le dossier projet
+          initMainFrame(); // Initialise la fenêtre principale
           break;
         } else {
           JOptionPane.showMessageDialog(optionFrame,
@@ -164,10 +196,13 @@ public class GUIController {
     }
   }
 
+  /**
+   * Initialise les écouteurs pour la fenêtre d'options (nouveau projet, ouvrir projet).
+   */
   private void initOptionFrameListener() {
     optionFrame.getNewProjet().addActionListener(e -> {
       optionFrame.dispose();
-      initNewProjet(); // Initialize the new project frame
+      initNewProjet(); // Initialise la fenêtre de nouveau projet
     });
 
     optionFrame.getOpenProjet().addActionListener(e -> {
@@ -175,15 +210,18 @@ public class GUIController {
     });
   }
 
+  /**
+   * Initialise les écouteurs pour la fenêtre de création de nouveau projet.
+   */
   private void initNewProjetFrameListener() {
     newProjetFrame.getCreateButton().addActionListener(e -> {
       String name = newProjetFrame.getNameTextArea().getText();
       String location = newProjetFrame.getLocationTextArea().getText();
       if (name != null && !name.isEmpty() && location != null && !location.isEmpty()) {
         currentFile = new File(location, name);
-        initProjectFolder(); // Initialize the project folder
+        initProjectFolder(); // Initialise le dossier projet
         newProjetFrame.dispose();
-        initMainFrame(); // Initialize the main frame
+        initMainFrame(); // Initialise la fenêtre principale
       } else {
         System.err.println("Name or location cannot be empty.");
       }
@@ -222,9 +260,13 @@ public class GUIController {
     });
   }
 
+  /**
+   * Sauvegarde le fichier de scénario à partir de la timeline.
+   * Écrase le fichier existant si besoin.
+   */
   private void saveScenarioFile() {
     if (scenarioFile.exists()) {
-      scenarioFile.delete(); // Delete the existing file to allow overwriting
+      scenarioFile.delete(); // Supprime l'ancien fichier pour permettre l'écrasement
     }
     try (FileWriter writer = new FileWriter(scenarioFile)) {
       for (Map.Entry<ImageIcon, Integer> entry : timeLinePanelController.getImageCopiesWithDurations()) {
@@ -240,19 +282,22 @@ public class GUIController {
     }
   }
 
+  /**
+   * Initialise les actions de la barre de menu principale.
+   */
   private void initMenuBarController() {
     JMenuItem newItem = mainFrame.getMenuItem(0, 0);
     if (newItem != null) {
       newItem.addActionListener(e -> {
         mainFrame.dispose();
-        initNewProjet(); // Initialize the new project frame
+        initNewProjet(); // Ouvre la fenêtre de nouveau projet
       });
     }
 
     JMenuItem openItem = mainFrame.getMenuItem(0, 1);
     if (openItem != null) {
       openItem.addActionListener(e -> {
-        openFolder(true); // Open the folder for a new project
+        openFolder(true); // Ouvre un dossier projet
       });
     }
 
@@ -266,33 +311,37 @@ public class GUIController {
     JMenuItem saveDrawItem = mainFrame.getMenuItem(0, 5);
     if (saveDrawItem != null) {
       saveDrawItem.addActionListener(e -> {
-        System.out.println("Save Draw clicked");
-        // FIXME: Add logic to save the drawing
+        imageEditor.valider();
       });
     }
 
     JMenuItem exitItem = mainFrame.getMenuItem(0, 7);
     if (exitItem != null) {
       exitItem.addActionListener(e -> {
-        System.exit(0); // Exit the application
+        System.exit(0); // Quitte l'application
       });
     }
 
     JMenuItem undoItem = mainFrame.getMenuItem(1, 0);
     if (undoItem != null) {
       undoItem.addActionListener(e -> {
-        // Add logic for undo operation
+        // Ajouter la logique pour l'annulation
       });
     }
 
     JMenuItem redoItem = mainFrame.getMenuItem(1, 1);
     if (redoItem != null) {
       redoItem.addActionListener(e -> {
-        // Add logic for redo operation
+        // Ajouter la logique pour le rétablissement
       });
     }
   }
 
+  /**
+   * Met à jour le panneau de visualisation avec une nouvelle image.
+   * @param imagePath chemin de l'image
+   * @param imageName nom de l'image
+   */
   public void updateViewPanel(String imagePath, String imageName) {
     if (viewPanelController != null) {
       viewPanelController.addOrUpdateImage(imagePath, imageName);

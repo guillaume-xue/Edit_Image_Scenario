@@ -9,16 +9,33 @@ import java.awt.Dimension;
 import java.awt.Cursor;
 import java.awt.event.MouseMotionAdapter;
 
+/**
+ * Panneau séparateur permettant de redimensionner dynamiquement deux panneaux adjacents
+ * (gauche et droite) dans une timeline ou une interface graphique similaire.
+ */
 public class DividerPanel extends JPanel {
 
+  // Panneau à gauche du séparateur
   private ResizablePanel left;
+  // Panneau à droite du séparateur
   private ResizablePanel right;
+  // Référence au séparateur précédent (pour chaînage)
   private DividerPanel precDividerPanel;
+  // Position X initiale lors du drag
   private int startX;
+  // Durée initiale des panneaux gauche et droite lors du drag
   private int startLeftDuration, startRightDuration;
+  // Facteur de zoom courant (pour conversion pixel <-> durée)
   private double zoomFactor;
+  // Indique si les listeners ont déjà été ajoutés (évite doublons)
   private boolean listenersAdded = false;
 
+  /**
+   * Constructeur du DividerPanel.
+   * @param prec séparateur précédent (peut être null)
+   * @param left panneau gauche à redimensionner
+   * @param right panneau droit à redimensionner
+   */
   public DividerPanel(DividerPanel prec, ResizablePanel left, ResizablePanel right) {
     if (prec != null) {
       prec.setRight(left);
@@ -32,9 +49,10 @@ public class DividerPanel extends JPanel {
     setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
     setBackground(Color.DARK_GRAY);
 
-    // Ajout des listeners une seule fois
+    // Ajout des listeners une seule fois pour gérer le redimensionnement
     if (!listenersAdded) {
       addMouseListener(new MouseAdapter() {
+        @Override
         public void mousePressed(MouseEvent e) {
           startX = e.getXOnScreen();
           // On récupère la durée et le zoom courant
@@ -45,6 +63,7 @@ public class DividerPanel extends JPanel {
       });
 
       addMouseMotionListener(new MouseMotionAdapter() {
+        @Override
         public void mouseDragged(MouseEvent e) {
           int dx = e.getXOnScreen() - startX;
           // Calcul de la nouvelle durée en fonction du zoom
@@ -72,7 +91,7 @@ public class DividerPanel extends JPanel {
           left.repaint();
           right.repaint();
 
-          // Ajout : mettre à jour la marge de fin si possible
+          // Mise à jour de la marge de fin si le panneau gauche le permet
           if (left instanceof ResizablePanel) {
             TimeLinePanel parentPanel = left.getParentTimeLinePanel();
             if (parentPanel != null) {
@@ -85,26 +104,32 @@ public class DividerPanel extends JPanel {
     }
   }
 
+  /** @return le panneau gauche */
   public ResizablePanel getLeft() {
     return left;
   }
 
+  /** @return le panneau droit */
   public ResizablePanel getRight() {
     return right;
   }
 
+  /** @return le séparateur précédent */
   public DividerPanel getPrecDividerPanel() {
     return precDividerPanel;
   }
 
+  /** Définit le séparateur précédent */
   public void setPrecDividerPanel(DividerPanel precDividerPanel) {
     this.precDividerPanel = precDividerPanel;
   }
 
+  /** Définit le panneau gauche */
   public void setLeft(ResizablePanel left) {
     this.left = left;
   }
 
+  /** Définit le panneau droit */
   public void setRight(ResizablePanel right) {
     this.right = right;
   }

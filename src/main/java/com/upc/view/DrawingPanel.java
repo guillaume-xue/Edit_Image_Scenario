@@ -1,22 +1,43 @@
 package com.upc.view;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * Panneau de dessin personnalisé permettant de dessiner des formes, des images et de gérer la prévisualisation.
+ * Utilisé dans l'éditeur d'image pour offrir des fonctionnalités de dessin interactives.
+ */
 public class DrawingPanel extends JPanel {
+    // Image tampon pour le dessin
     private BufferedImage bi;
+    // Contexte graphique associé à l'image tampon
     private Graphics2D gi;
+    // Coordonnées et propriétés de la forme en prévisualisation
     private int previewX, previewY, previewWidth, previewHeight, previewStrokeWidth;
     private Color previewColor;
     private boolean isPreviewing = false;
     private String previewShape = ""; // "Cercle" ou "Carré"
 
+    /**
+     * Constructeur du panneau de dessin.
+     * Initialise le fond en blanc.
+     */
     public DrawingPanel() {
         super();
         setBackground(Color.WHITE);
     }
 
+    /**
+     * Dessine une ligne sur le canvas.
+     * @param ox abscisse du point de départ
+     * @param oy ordonnée du point de départ
+     * @param x abscisse du point d'arrivée
+     * @param y ordonnée du point d'arrivée
+     * @param color couleur de la ligne
+     * @param strokeWidth épaisseur du trait
+     */
     public void drawLine(int ox, int oy, int x, int y, Color color, int strokeWidth) {
         gi.setStroke(new BasicStroke(strokeWidth));
         gi.setColor(color);
@@ -24,6 +45,10 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Redéfinition de la méthode de dessin du composant.
+     * Affiche le contenu du canvas et la forme temporaire si en mode prévisualisation.
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -49,11 +74,18 @@ public class DrawingPanel extends JPanel {
         }
     }
 
+    /**
+     * Retourne la taille préférée du panneau.
+     * @return dimension courante du panneau
+     */
     @Override
     public Dimension getPreferredSize() {
         return getSize();
     }
 
+    /**
+     * Dessine un ovale sur le canvas.
+     */
     public void drawOval(int x, int y, int width, int height, Color color, int strokeWidth) {
         gi.setStroke(new BasicStroke(strokeWidth));
         gi.setColor(color);
@@ -61,6 +93,10 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Dessine une image sur le canvas.
+     * @param imageIcon image à dessiner
+     */
     public void drawImageIcon(ImageIcon imageIcon) {
         if (imageIcon != null) {
             Image image = imageIcon.getImage();
@@ -71,6 +107,9 @@ public class DrawingPanel extends JPanel {
         }
     }
 
+    /**
+     * Dessine un rectangle sur le canvas.
+     */
     public void drawRect(int x, int y, int width, int height, Color color, int strokeWidth) {
         gi.setStroke(new BasicStroke(strokeWidth));
         gi.setColor(color);
@@ -78,6 +117,9 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Définit la forme à prévisualiser (cercle ou carré) et ses propriétés.
+     */
     public void setPreviewShape(String shape, int x, int y, int width, int height, int strokeWidth, Color color) {
         this.previewShape = shape;
         this.previewX = x;
@@ -90,11 +132,18 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Efface la prévisualisation de la forme temporaire.
+     */
     public void clearPreview() {
         this.isPreviewing = false;
         repaint();
     }
 
+    /**
+     * Vérifie si le canvas est vide (tout blanc).
+     * @return true si vide, false sinon
+     */
     public boolean isEmpty() {
         if (bi == null)
             return true;
@@ -110,6 +159,9 @@ public class DrawingPanel extends JPanel {
         return true;
     }
 
+    /**
+     * Efface tout le contenu du canvas (remplit en blanc).
+     */
     public void clearAll() {
         if (bi == null)
             return;
@@ -118,16 +170,27 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Retourne l'image tampon du panneau.
+     * @return BufferedImage courante
+     */
     public BufferedImage getBufferedImage() {
         return bi;
     }
 
+    /**
+     * Redimensionne le panneau et adapte le canvas à la nouvelle taille.
+     */
     @Override
     public void setBounds(int x, int y, int width, int height) {
         super.setBounds(x, y, width, height);
         resizeCanvas(width, height);
     }
 
+    /**
+     * Redimensionne le canvas interne à la nouvelle taille du panneau.
+     * Conserve le contenu existant si possible.
+     */
     private void resizeCanvas(int newWidth, int newHeight) {
         if (newWidth <= 0 || newHeight <= 0)
             return;
@@ -157,6 +220,9 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Initialise le canvas interne si nécessaire (appelé lors du rendu).
+     */
     public void initializeCanvas() {
         int w = getWidth();
         int h = getHeight();
@@ -174,6 +240,10 @@ public class DrawingPanel extends JPanel {
         }
     }
 
+    /**
+     * Recherche et retourne la vue parente de type ImageEditorView.
+     * @return l'ImageEditorView parent ou null si non trouvée
+     */
     public ImageEditorView getImageEditorView() {
         java.awt.Container parent = getParent();
         while (parent != null) {

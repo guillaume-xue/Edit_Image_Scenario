@@ -36,6 +36,10 @@ public class OptionFrame extends JFrame {
     add(newProjetPanel);
   }
 
+  /**
+   * Définit la taille, la police et l'alignement des boutons passés en paramètre.
+   * @param buttons boutons à personnaliser
+   */
   private void setButtonDimensions(JButton... buttons) {
     int width = 178;
     int height = 48;
@@ -48,6 +52,11 @@ public class OptionFrame extends JFrame {
     }
   }
 
+  /**
+   * Crée et retourne le panneau principal de l'écran d'accueil,
+   * avec les boutons pour créer ou ouvrir un projet.
+   * @return JPanel principal de l'accueil
+   */
   public JPanel createNewProjet() {
     JPanel newProjetPanel = new JPanel();
     newProjetPanel.setLayout(new BoxLayout(newProjetPanel, BoxLayout.Y_AXIS));
@@ -62,6 +71,8 @@ public class OptionFrame extends JFrame {
     newProjet.setAlignmentX(JButton.CENTER_ALIGNMENT);
     openProjet.setAlignmentX(JButton.CENTER_ALIGNMENT);
     setButtonDimensions(newProjet, openProjet);
+
+    // Ajout des icônes aux boutons
     try {
       File folderIcon = new File("src/main/resources/Icon/folderIcon.png");
       File plusIcon = new File("src/main/resources/Icon/plusIcon.png");

@@ -9,8 +9,16 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * Contrôleur pour la gestion des interactions souris sur différents composants de l'application.
+ * Gère le redimensionnement, les effets de survol et les menus contextuels.
+ */
 public class MouseController {
 
+  /**
+   * Contrôleur pour la gestion de la souris sur les panneaux redimensionnables de la timeline.
+   * Permet le redimensionnement, la suppression, la modification de durée et le déplacement.
+   */
   public class TimeLinePanelMouseController extends MouseAdapter {
 
     ResizablePanel resizablePanel;
@@ -28,18 +36,19 @@ public class MouseController {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (e.getButton() == MouseEvent.BUTTON3) { // Right mouse button
+      if (e.getButton() == MouseEvent.BUTTON3) { // Clic droit
         JPopupMenu menu = new JPopupMenu();
+        // Option de suppression
         JMenuItem del = new JMenuItem("Delete");
         del.addActionListener(event -> {
           timeLinePanelController.removeImageLabel(resizablePanel);
         });
         menu.add(del);
 
-        // Ajout du bouton "Temps"
+        // Option pour modifier la durée
         JMenuItem setTime = new JMenuItem("Temps");
         setTime.addActionListener(event -> {
-          // Ouvre un petit JDialog pour saisir la durée en ms
+          // Ouvre un JDialog pour saisir la durée en ms
           String input = JOptionPane.showInputDialog(resizablePanel, "Entrer la durée (ms) :", resizablePanel.getDuration());
           if (input != null) {
             try {
@@ -56,25 +65,28 @@ public class MouseController {
         });
         menu.add(setTime);
 
-        // Ajout des actions de déplacement
+        // Option pour déplacer au début
         JMenuItem moveStart = new JMenuItem("Début");
         moveStart.addActionListener(event -> {
           timeLinePanelController.moveResizablePanelTo(resizablePanel, 0);
         });
         menu.add(moveStart);
 
+        // Option pour déplacer à la fin
         JMenuItem moveEnd = new JMenuItem("Fin");
         moveEnd.addActionListener(event -> {
           timeLinePanelController.moveResizablePanelTo(resizablePanel, -1); // -1 pour la fin
         });
         menu.add(moveEnd);
 
+        // Option pour avancer
         JMenuItem moveForward = new JMenuItem("Avancer");
         moveForward.addActionListener(event -> {
           timeLinePanelController.moveResizablePanelRelative(resizablePanel, 1);
         });
         menu.add(moveForward);
 
+        // Option pour reculer
         JMenuItem moveBackward = new JMenuItem("Reculer");
         moveBackward.addActionListener(event -> {
           timeLinePanelController.moveResizablePanelRelative(resizablePanel, -1);
@@ -90,7 +102,7 @@ public class MouseController {
       if (e.getButton() == MouseEvent.BUTTON1) {
         int x = e.getX();
         int width = resizablePanel.getWidth();
-        // Toujours synchroniser le zoom avec le TimeLinePanel
+        // Synchronise le zoom avec le TimeLinePanel
         double currentZoom = timeLinePanelController.getTimeLinePanel().getZoomFactor();
         resizablePanel.setZoomFactor(currentZoom);
         if (x >= width - 10 && x <= width) {
@@ -137,6 +149,9 @@ public class MouseController {
     }
   }
 
+  /**
+   * Effet de survol pour les boutons (changement de couleur au passage de la souris).
+   */
   public class ButtonEffect extends MouseAdapter {
 
     JButton button;
@@ -160,6 +175,10 @@ public class MouseController {
     }
   }
 
+  /**
+   * Contrôleur pour la gestion de la souris sur les panneaux d'image de la vue.
+   * Permet le drag & drop et la suppression via menu contextuel.
+   */
   public class ViewPanelMouseController extends MouseAdapter {
 
     ImageViewPanel panel;
@@ -173,10 +192,10 @@ public class MouseController {
 
     @Override
     public void mousePressed(MouseEvent e) {
-      if (e.getButton() == MouseEvent.BUTTON1) { // Left mouse button
+      if (e.getButton() == MouseEvent.BUTTON1) { // Clic gauche
         TransferHandler handler = panel.getTransferHandler();
         handler.exportAsDrag(panel, e, TransferHandler.COPY);
-      } else if (e.getButton() == MouseEvent.BUTTON3) { // Right mouse button
+      } else if (e.getButton() == MouseEvent.BUTTON3) { // Clic droit
         JPopupMenu menu = new JPopupMenu();
         JMenuItem del = new JMenuItem("Delete");
         del.addActionListener(event -> {

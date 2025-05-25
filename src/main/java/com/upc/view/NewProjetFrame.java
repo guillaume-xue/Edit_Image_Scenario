@@ -12,21 +12,38 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+/**
+ * Fenêtre de création d'un nouveau projet.
+ * Permet à l'utilisateur de saisir le nom, l'emplacement et de valider ou annuler la création.
+ */
 public class NewProjetFrame extends JFrame {
 
+  // Bouton pour ouvrir le sélecteur de dossier
   private JButton browserButton;
+  // Bouton pour créer le projet
   private JButton createButton;
+  // Bouton pour annuler la création
   private JButton cancelButton;
+  // Zone de texte pour le nom du projet
   private JTextArea name;
+  // Zone de texte pour l'emplacement du projet
   private JTextArea location;
+  // Label affichant le chemin du dossier projet
   private JLabel directoryLabel;
 
+  /**
+   * Constructeur de la fenêtre de nouveau projet.
+   * Initialise la fenêtre et ses propriétés.
+   */
   public NewProjetFrame() {
     super();
     setResizable(false);
     init();
   }
 
+  /**
+   * Initialise les propriétés de la fenêtre principale.
+   */
   public void init() {
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setTitle("Welcome to Image Editor");
@@ -35,6 +52,10 @@ public class NewProjetFrame extends JFrame {
     setVisible(true);
   }
 
+  /**
+   * Crée un panneau vide avec fond blanc.
+   * @return JPanel vide
+   */
   public JPanel emptyPanel() {
     JPanel emptyPanel = new JPanel();
     emptyPanel.setBackground(new Color(255, 255, 255));

@@ -7,6 +7,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -17,8 +18,19 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
 
+/**
+ * Fenêtre principale de l'application.
+ * Gère la disposition générale, les menus, les onglets et l'intégration des différents panneaux.
+ */
 public class MainFrame extends JFrame {
 
+  /**
+   * Constructeur de la fenêtre principale.
+   * @param imageEditPanel panneau d'édition d'image
+   * @param viewPanel panneau de visualisation des images
+   * @param timeLinePanel panneau de timeline pour l'animation
+   * @param animeViewPanel panneau de visualisation de l'animation
+   */
   public MainFrame(ImageEditorView imageEditPanel, ViewPanel viewPanel, TimeLinePanel timeLinePanel,
       AnimeViewPanel animeViewPanel) {
     init();
@@ -32,8 +44,7 @@ public class MainFrame extends JFrame {
     splitPane.setDividerSize(8);
     splitPane.setResizeWeight(0.5);
 
-    // Définir une taille minimale très faible pour permettre le redimensionnement
-    // libre
+    // Définir une taille minimale très faible pour permettre le redimensionnement libre
     JTabbedPane tabbedPane = new JTabbedPane();
     tabbedPane.setTabPlacement(JTabbedPane.LEFT);
     tabbedPane.addTab("Draw", imageEditPanel);
@@ -43,6 +54,7 @@ public class MainFrame extends JFrame {
     animeViewPanel.setMinimumSize(new Dimension(10, 10));
     viewPanel.setMinimumSize(new Dimension(10, 10));
 
+    // Gestion du détachement de l'onglet Animation par double-clic
     tabbedPane.addMouseListener(new MouseAdapter() {
       private boolean isDragging = false;
 
@@ -113,6 +125,9 @@ public class MainFrame extends JFrame {
     add(mainSplitPane);
   }
 
+  /**
+   * Initialise la fenêtre principale (taille, titre, fermeture, etc.).
+   */
   private void init() {
     this.setSize(1280, 720);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -120,11 +135,11 @@ public class MainFrame extends JFrame {
     this.setLocationRelativeTo(null);
     this.setVisible(true);
     this.setLayout(new BorderLayout());
-    // Supprimer ou commenter la ligne suivante pour ne pas bloquer le
-    // redimensionnement :
-    // this.setMinimumSize(new Dimension(800, 700));
   }
 
+  /**
+   * Crée la barre de menus principale avec les menus Fichier et Edition.
+   */
   private void createMenuBar() {
     JMenuBar menuBar = new JMenuBar();
 
@@ -156,6 +171,12 @@ public class MainFrame extends JFrame {
     this.setJMenuBar(menuBar);
   }
 
+  /**
+   * Permet de récupérer un JMenuItem à partir de son index de menu et d'item.
+   * @param menuIndex index du menu dans la barre de menus
+   * @param itemIndex index de l'item dans le menu
+   * @return JMenuItem correspondant ou null si non trouvé
+   */
   public JMenuItem getMenuItem(int menuIndex, int itemIndex) {
     JMenuBar menuBar = this.getJMenuBar();
     if (menuBar == null || menuIndex < 0 || menuIndex >= menuBar.getMenuCount()) {

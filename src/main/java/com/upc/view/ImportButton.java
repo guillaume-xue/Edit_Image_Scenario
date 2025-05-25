@@ -4,7 +4,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
-
 import java.io.File;
 
 import javax.swing.Box;
@@ -13,8 +12,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+/**
+ * Bouton personnalisé pour l'importation d'images.
+ * Affiche une icône et un texte centrés verticalement, avec coins arrondis.
+ */
 public class ImportButton extends JButton {
 
+  /**
+   * Constructeur du bouton d'importation.
+   * Charge l'icône d'importation et configure la disposition verticale.
+   */
   public ImportButton() {
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     File folderIcon = new File("src/main/resources/Icon/import.png");
@@ -38,6 +45,10 @@ public class ImportButton extends JButton {
     setOpaque(false);
   }
 
+  /**
+   * Redéfinition du rendu du composant pour dessiner un fond arrondi.
+   * @param g contexte graphique
+   */
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
