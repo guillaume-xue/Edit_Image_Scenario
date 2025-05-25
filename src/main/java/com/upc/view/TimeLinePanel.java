@@ -10,14 +10,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-import com.upc.controller.TimeLinePanelController;
-
 public class TimeLinePanel extends JPanel {
     private JPanel timeLineScene;
     private TimePanel numbersPanel;
     private double zoomFactor = 1.0;
     private JScrollPane scrollPane;
-    private TimeLinePanelController controller;
     private JButton zoomInButton;
     private JButton zoomOutButton;
     private JPanel endMarginPanel = new JPanel(); // Marge de fin
@@ -74,10 +71,11 @@ public class TimeLinePanel extends JPanel {
         // Les boutons n'ont pas d'action tant que le contrôleur n'est pas défini
     }
 
-    public void setController(com.upc.controller.TimeLinePanelController controller) {
-        this.controller = controller;
-        zoomInButton.addActionListener(e -> controller.zoomIn());
-        zoomOutButton.addActionListener(e -> controller.zoomOut());
+    public JButton getZoomInButton() {
+        return zoomInButton;
+    }
+    public JButton getZoomOutButton() {
+        return zoomOutButton;
     }
 
     public JPanel getTimeLinePanel() {

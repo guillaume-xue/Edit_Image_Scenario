@@ -29,7 +29,8 @@ public class TimeLinePanelController {
     this.mouseController = mouseController;
     this.loadingDialog = loadingDialog;
     this.timeLinePanel.setTransferHandler(transferController.new TransferTimeLine(this));
-    this.timeLinePanel.setController(this); // Connecte le contrôleur à la vue pour les boutons
+    this.timeLinePanel.getZoomInButton().addActionListener(e -> zoomIn());
+    this.timeLinePanel.getZoomOutButton().addActionListener(e -> zoomOut());
   }
 
   public void initTimeLinePanel(File scenario, File imageDirectory) {

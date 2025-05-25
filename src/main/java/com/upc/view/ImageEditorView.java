@@ -1,9 +1,6 @@
 package com.upc.view;
 
 import javax.swing.*;
-
-import com.upc.controller.DrawingController;
-
 import java.awt.*;
 import com.upc.controller.ImageEditorController.ColorIcon;;
 

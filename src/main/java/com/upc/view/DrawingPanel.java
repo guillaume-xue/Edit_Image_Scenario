@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 public class DrawingPanel extends JPanel {
     private BufferedImage bi;
     private Graphics2D gi;
-    private DrawingController controller;
     private int previewX, previewY, previewWidth, previewHeight, previewStrokeWidth;
     private Color previewColor;
     private boolean isPreviewing = false;
@@ -28,11 +27,6 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
-    public void setController(DrawingController controller) {
-        this.controller = controller;
-        addMouseListener(controller);
-        addMouseMotionListener(controller);
-    }
 
     @Override
     public void paintComponent(Graphics g) {
@@ -182,4 +176,15 @@ public class DrawingPanel extends JPanel {
             dim = new Dimension(w, h);
         }
     }
+
+    public ImageEditorView getImageEditorView() {
+        java.awt.Container parent = getParent();
+        while (parent != null) {
+            if (parent instanceof ImageEditorView) {
+                return (ImageEditorView) parent;
+            }
+            parent = parent.getParent();
+        }
+        return null; // Si aucun parent n'est trouvé
+    } 
 }

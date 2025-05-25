@@ -80,7 +80,8 @@ public class ImageEditorController {
             case "+":
                 DrawingPanel newPanel = new DrawingPanel();
                 DrawingController newController = new DrawingController(newPanel, model, transferController, imageDir);
-                newPanel.setController(newController);
+                newPanel.addMouseListener(newController);
+                newPanel.addMouseMotionListener(newController);
                 view.addDrawingPanel("Dessin " + (++cpt), newPanel);
                 break;
             case "Clear":
