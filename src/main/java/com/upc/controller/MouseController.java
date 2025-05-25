@@ -35,6 +35,32 @@ public class MouseController {
           timeLinePanelController.removeImageLabel(resizablePanel);
         });
         menu.add(del);
+
+        // Ajout des actions de déplacement
+        JMenuItem moveStart = new JMenuItem("Début");
+        moveStart.addActionListener(event -> {
+          timeLinePanelController.moveResizablePanelTo(resizablePanel, 0);
+        });
+        menu.add(moveStart);
+
+        JMenuItem moveEnd = new JMenuItem("Fin");
+        moveEnd.addActionListener(event -> {
+          timeLinePanelController.moveResizablePanelTo(resizablePanel, -1); // -1 pour la fin
+        });
+        menu.add(moveEnd);
+
+        JMenuItem moveForward = new JMenuItem("Avancer");
+        moveForward.addActionListener(event -> {
+          timeLinePanelController.moveResizablePanelRelative(resizablePanel, 1);
+        });
+        menu.add(moveForward);
+
+        JMenuItem moveBackward = new JMenuItem("Reculer");
+        moveBackward.addActionListener(event -> {
+          timeLinePanelController.moveResizablePanelRelative(resizablePanel, -1);
+        });
+        menu.add(moveBackward);
+
         menu.show(resizablePanel, e.getX(), e.getY());
       }
     }

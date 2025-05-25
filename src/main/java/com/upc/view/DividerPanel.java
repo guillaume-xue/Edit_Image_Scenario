@@ -17,6 +17,7 @@ public class DividerPanel extends JPanel {
   private int startX;
   private int startLeftDuration, startRightDuration;
   private double zoomFactor;
+  private boolean listenersAdded = false;
 
   public DividerPanel(DividerPanel prec, ResizablePanel left, ResizablePanel right) {
     if (prec != null) {
@@ -31,53 +32,57 @@ public class DividerPanel extends JPanel {
     setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
     setBackground(Color.DARK_GRAY);
 
-    addMouseListener(new MouseAdapter() {
-      public void mousePressed(MouseEvent e) {
-        startX = e.getXOnScreen();
-        // On récupère la durée et le zoom courant
-        startLeftDuration = left.getDuration();
-        startRightDuration = right.getDuration();
-        zoomFactor = left.getZoomFactor();
-      }
-    });
-
-    addMouseMotionListener(new MouseMotionAdapter() {
-      public void mouseDragged(MouseEvent e) {
-        int dx = e.getXOnScreen() - startX;
-        // Calcul de la nouvelle durée en fonction du zoom
-        int newLeftDuration = Math.max(1, (int)Math.round(startLeftDuration + (dx / zoomFactor)));
-        int newRightDuration = startRightDuration > 0
-          ? Math.max(1, (int)Math.round(startRightDuration - (dx / zoomFactor)))
-          : 0;
-
-        // Largeur minimale de 40px
-        int minDuration = (int)Math.ceil(40.0 / zoomFactor);
-        newLeftDuration = Math.max(newLeftDuration, minDuration);
-        if (newRightDuration > 0) {
-          newRightDuration = Math.max(newRightDuration, minDuration);
+    // Ajout des listeners une seule fois
+    if (!listenersAdded) {
+      addMouseListener(new MouseAdapter() {
+        public void mousePressed(MouseEvent e) {
+          startX = e.getXOnScreen();
+          // On récupère la durée et le zoom courant
+          startLeftDuration = left.getDuration();
+          startRightDuration = right.getDuration();
+          zoomFactor = left.getZoomFactor();
         }
+      });
 
-        left.setDuration(newLeftDuration);
-        if (right.getDuration() != 0) {
-          right.setDuration(newRightDuration);
-        }
+      addMouseMotionListener(new MouseMotionAdapter() {
+        public void mouseDragged(MouseEvent e) {
+          int dx = e.getXOnScreen() - startX;
+          // Calcul de la nouvelle durée en fonction du zoom
+          int newLeftDuration = Math.max(1, (int)Math.round(startLeftDuration + (dx / zoomFactor)));
+          int newRightDuration = startRightDuration > 0
+            ? Math.max(1, (int)Math.round(startRightDuration - (dx / zoomFactor)))
+            : 0;
 
-        left.revalidate();
-        right.revalidate();
-        DividerPanel.this.getParent().revalidate();
-        DividerPanel.this.getParent().repaint();
-        left.repaint();
-        right.repaint();
+          // Largeur minimale de 40px
+          int minDuration = (int)Math.ceil(40.0 / zoomFactor);
+          newLeftDuration = Math.max(newLeftDuration, minDuration);
+          if (newRightDuration > 0) {
+            newRightDuration = Math.max(newRightDuration, minDuration);
+          }
 
-        // Ajout : mettre à jour la marge de fin si possible
-        if (left instanceof com.upc.view.ResizablePanel) {
-          com.upc.view.TimeLinePanel parentPanel = left.getParentTimeLinePanel();
-          if (parentPanel != null) {
-            parentPanel.updateEndMarginPanel();
+          left.setDuration(newLeftDuration);
+          if (right.getDuration() != 0) {
+            right.setDuration(newRightDuration);
+          }
+
+          left.revalidate();
+          right.revalidate();
+          DividerPanel.this.getParent().revalidate();
+          DividerPanel.this.getParent().repaint();
+          left.repaint();
+          right.repaint();
+
+          // Ajout : mettre à jour la marge de fin si possible
+          if (left instanceof com.upc.view.ResizablePanel) {
+            com.upc.view.TimeLinePanel parentPanel = left.getParentTimeLinePanel();
+            if (parentPanel != null) {
+              parentPanel.updateEndMarginPanel();
+            }
           }
         }
-      }
-    });
+      });
+      listenersAdded = true;
+    }
   }
 
   public ResizablePanel getLeft() {

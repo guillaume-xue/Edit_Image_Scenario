@@ -3,11 +3,14 @@ package com.upc.controller;
 import java.awt.Image;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import javax.swing.JScrollBar;
 
 import com.upc.view.DividerPanel;
 import com.upc.view.ResizablePanel;
@@ -116,24 +119,24 @@ public class TimeLinePanelController {
   }
 
   private void syncScroll() {
-    javax.swing.JScrollBar hBar = timeLinePanel.getScrollPane().getHorizontalScrollBar();
+    JScrollBar hBar = timeLinePanel.getScrollPane().getHorizontalScrollBar();
     int value = hBar.getValue();
     hBar.setValue(value); // Force la synchro de la position
   }
 
   public void addImageLabel(ImageIcon imageIcon, int duration) {
-    com.upc.view.ResizablePanel resizablePanel = new com.upc.view.ResizablePanel(imageIcon, duration);
+    ResizablePanel resizablePanel = new ResizablePanel(imageIcon, duration);
     double zoom = timeLinePanel.getZoomFactor();
     resizablePanel.updateWidthFromDuration(zoom);
     resizablePanel.setParentTimeLinePanel(timeLinePanel); // Ajouté
     resizablePanel.addMouseListener(mouseController.new TimeLinePanelMouseController(resizablePanel, this));
-    com.upc.view.ResizablePanel emptyPanel = new com.upc.view.ResizablePanel();
+    ResizablePanel emptyPanel = new ResizablePanel();
     timeLinePanel.getTimeLinePanel().add(resizablePanel);
     if (currentDividerPanel != null) {
       timeLinePanel.getTimeLinePanel().remove(timeLinePanel.getTimeLinePanel().getComponentCount() - 2);
-      currentDividerPanel = new com.upc.view.DividerPanel(currentDividerPanel, resizablePanel, emptyPanel);
+      currentDividerPanel = new DividerPanel(currentDividerPanel, resizablePanel, emptyPanel);
     } else {
-      currentDividerPanel = new com.upc.view.DividerPanel(null, resizablePanel, emptyPanel);
+      currentDividerPanel = new DividerPanel(null, resizablePanel, emptyPanel);
     }
 
     timeLinePanel.getTimeLinePanel().add(currentDividerPanel);
@@ -190,5 +193,91 @@ public class TimeLinePanelController {
 
   public TimeLinePanel getTimeLinePanel() {
     return timeLinePanel;
+  }
+
+  // Déplacer la scène à une position absolue (0 = début, -1 = fin)
+  public void moveResizablePanelTo(ResizablePanel panel, int index) {
+    JPanel scene = timeLinePanel.getTimeLinePanel();
+    List<ResizablePanel> panels = new ArrayList<>();
+    for (int i = 0; i < scene.getComponentCount(); i++) {
+      if (scene.getComponent(i) instanceof ResizablePanel) {
+        ResizablePanel rp = (ResizablePanel) scene.getComponent(i);
+        if (rp.getIcon() != null) {
+          panels.add(rp);
+        }
+      }
+    }
+    panels.remove(panel);
+    if (index < 0 || index > panels.size()) {
+      panels.add(panel); // fin
+    } else {
+      panels.add(index, panel);
+    }
+
+    // Reconstruire la timeline sans empty panels
+    scene.removeAll();
+    DividerPanel prev = null;
+    double zoom = timeLinePanel.getZoomFactor();
+    for (int i = 0; i < panels.size(); i++) {
+      ResizablePanel rp = panels.get(i);
+      rp.setZoomFactor(zoom);
+      rp.updateWidthFromDuration(zoom);
+      scene.add(rp);
+      DividerPanel divider = new DividerPanel(prev, rp, null);
+      scene.add(divider);
+      prev = divider;
+    }
+    currentDividerPanel = prev;
+    scene.revalidate();
+    scene.repaint();
+    timeLinePanel.updateEndMarginPanel();
+    timeLinePanel.revalidate();
+    timeLinePanel.repaint();
+  }
+
+  // Déplacer la scène d'un pas relatif (+1 = avancer, -1 = reculer)
+  public void moveResizablePanelRelative(ResizablePanel panel, int delta) {
+    JPanel scene = timeLinePanel.getTimeLinePanel();
+    List<ResizablePanel> panels = new ArrayList<>();
+    for (int i = 0; i < scene.getComponentCount(); i++) {
+      if (scene.getComponent(i) instanceof ResizablePanel) {
+        ResizablePanel rp = (ResizablePanel) scene.getComponent(i);
+        if (rp.getIcon() != null) {
+          panels.add(rp);
+        }
+      }
+    }
+    int idx = panels.indexOf(panel);
+    if (idx == -1)
+      return;
+    int newIdx = idx + delta;
+    if (newIdx < 0)
+      newIdx = 0;
+    if (newIdx >= panels.size())
+      newIdx = panels.size() - 1;
+    if (newIdx == idx)
+      return;
+    panels.remove(idx);
+    panels.add(newIdx, panel);
+
+    // Reconstruire la timeline sans empty panels
+    scene.removeAll();
+    DividerPanel prev = null;
+    double zoom = timeLinePanel.getZoomFactor();
+    for (int i = 0; i < panels.size(); i++) {
+      ResizablePanel rp = panels.get(i);
+      rp.setZoomFactor(zoom);
+      rp.updateWidthFromDuration(zoom);
+      scene.add(rp);
+      DividerPanel divider = new DividerPanel(prev, rp, null);
+      scene.add(divider);
+      prev = divider;
+    }
+    currentDividerPanel = prev;
+    scene.revalidate();
+    scene.repaint();
+    timeLinePanel.updateEndMarginPanel();
+    timeLinePanel.revalidate();
+    timeLinePanel.repaint();
   }
 }
