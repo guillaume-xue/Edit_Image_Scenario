@@ -17,6 +17,7 @@ public class AnimeViewPanel extends JPanel {
   private JButton backButton;
   private JButton advanceButton;
   private JButton loopButton;
+  private JButton directButton;
   private JLabel timer;
   private JSlider timelineSlider;
 
@@ -52,17 +53,20 @@ public class AnimeViewPanel extends JPanel {
     File backIcon = new File("src/main/resources/Icon/back.png");
     File advanceIcon = new File("src/main/resources/Icon/advance.png");
     File loopIcon = new File("src/main/resources/Icon/loop.png");
+    File directIcon = new File("src/main/resources/Icon/direct.png");
     Image startImg = null;
     Image breakImg = null;
     Image backImg = null;
     Image advanceImg = null;
     Image loopImg = null;
+    Image direct = null;
     try {
       startImg = ImageIO.read(startIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
       breakImg = ImageIO.read(breakIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
       backImg = ImageIO.read(backIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
       advanceImg = ImageIO.read(advanceIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
       loopImg = ImageIO.read(loopIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
+      direct = ImageIO.read(directIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -71,6 +75,8 @@ public class AnimeViewPanel extends JPanel {
     backButton = new JButton(new ImageIcon(backImg));
     advanceButton = new JButton(new ImageIcon(advanceImg));
     loopButton = new JButton(new ImageIcon(loopImg));
+    directButton = new JButton(new ImageIcon(direct));
+    directButton.setVisible(false);
     breakButton.setVisible(false);
 
     timer = new JLabel("00:00:00");
@@ -88,6 +94,7 @@ public class AnimeViewPanel extends JPanel {
     buttonPanel.add(advanceButton);
     buttonPanel.add(Box.createHorizontalStrut(10));
     buttonPanel.add(loopButton);
+    buttonPanel.add(directButton);
     buttonPanel.add(Box.createHorizontalStrut(10));
     buttonPanel.add(Box.createHorizontalStrut(timer.getPreferredSize().width));
     buttonPanel.add(Box.createHorizontalGlue());
@@ -128,6 +135,14 @@ public class AnimeViewPanel extends JPanel {
 
   public JButton getAdvanceButton() {
     return advanceButton;
+  }
+
+  public JButton getLoopButton() {
+    return loopButton;
+  }
+
+  public JButton getDirectButton() {
+    return directButton;
   }
 
   // Getter for the timeline slider
