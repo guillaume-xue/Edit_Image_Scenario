@@ -1,5 +1,6 @@
 package com.upc.view;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.BorderLayout;
@@ -7,8 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
-import static javax.imageio.ImageIO.read;
-import static java.awt.Image.SCALE_SMOOTH;
 
 public class AnimeViewPanel extends JPanel {
 
