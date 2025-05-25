@@ -256,14 +256,22 @@ public class GUIController {
       });
     }
 
-    JMenuItem saveItem = mainFrame.getMenuItem(0, 2);
-    if (saveItem != null) {
-      saveItem.addActionListener(e -> {
+    JMenuItem saveSenarioItem = mainFrame.getMenuItem(0, 3);
+    if (saveSenarioItem != null) {
+      saveSenarioItem.addActionListener(e -> {
         saveScenarioFile();
       });
     }
 
-    JMenuItem exitItem = mainFrame.getMenuItem(0, 4);
+    JMenuItem saveDrawItem = mainFrame.getMenuItem(0, 5);
+    if (saveDrawItem != null) {
+      saveDrawItem.addActionListener(e -> {
+        System.out.println("Save Draw clicked");
+        // FIXME: Add logic to save the drawing
+      });
+    }
+
+    JMenuItem exitItem = mainFrame.getMenuItem(0, 7);
     if (exitItem != null) {
       exitItem.addActionListener(e -> {
         System.exit(0); // Exit the application

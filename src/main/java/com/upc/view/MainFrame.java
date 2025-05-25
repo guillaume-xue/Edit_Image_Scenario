@@ -131,12 +131,16 @@ public class MainFrame extends JFrame {
     JMenu fileMenu = new JMenu("File");
     JMenuItem newItem = new JMenuItem("New Project");
     JMenuItem openItem = new JMenuItem("Open");
-    JMenuItem saveItem = new JMenuItem("Save");
+    JMenuItem saveSenarioItem = new JMenuItem("Save Senario");
+    JMenuItem saveDrawItem = new JMenuItem("Save Draw");
     JMenuItem exitItem = new JMenuItem("Exit");
 
     fileMenu.add(newItem);
     fileMenu.add(openItem);
-    fileMenu.add(saveItem);
+    fileMenu.addSeparator();
+    fileMenu.add(saveSenarioItem);
+    fileMenu.addSeparator();
+    fileMenu.add(saveDrawItem);
     fileMenu.addSeparator();
     fileMenu.add(exitItem);
     menuBar.add(fileMenu);
