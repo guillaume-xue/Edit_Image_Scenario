@@ -6,10 +6,12 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -98,7 +100,7 @@ public class ViewPanelController {
           }
 
           @Override
-          protected void process(java.util.List<File> chunks) {
+          protected void process(List<File> chunks) {
             for (File file : chunks) {
               addImageViewPanel(file.getAbsolutePath(), file.getName());
             }
@@ -197,7 +199,7 @@ public class ViewPanelController {
 
   public void addOrUpdateImage(String imagePath, String imageName) {
     boolean found = false;
-    for (java.awt.Component comp : viewPanel.getMainPanel().getComponents()) {
+    for (Component comp : viewPanel.getMainPanel().getComponents()) {
         if (comp instanceof com.upc.view.ImageViewPanel) {
             ImageViewPanel panel = (ImageViewPanel) comp;
             ImageIcon icon = panel.getImageIcon();

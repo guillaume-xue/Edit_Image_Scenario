@@ -1,15 +1,19 @@
 package com.upc.controller;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.io.FileWriter;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
@@ -147,7 +151,7 @@ public class GUIController {
           initMainFrame(); // Initialize the main frame
           break;
         } else {
-          javax.swing.JOptionPane.showMessageDialog(optionFrame,
+          JOptionPane.showMessageDialog(optionFrame,
               "Le dossier sélectionné n'est pas un dossier de projet valide.\n" +
                   "Il doit contenir :\n- un dossier 'images'\n- un fichier 'resources.properties'\n- un fichier 'scenario.txt'",
               "Erreur de dossier projet", javax.swing.JOptionPane.ERROR_MESSAGE);
@@ -207,8 +211,8 @@ public class GUIController {
       newProjetFrame.revalidate();
     });
 
-    newProjetFrame.getNameTextArea().addKeyListener(new java.awt.event.KeyAdapter() {
-      public void keyReleased(java.awt.event.KeyEvent evt) {
+    newProjetFrame.getNameTextArea().addKeyListener(new KeyAdapter() {
+      public void keyReleased(KeyEvent evt) {
         String name = newProjetFrame.getNameTextArea().getText();
         String location = newProjetFrame.getLocationTextArea().getText();
         newProjetFrame.getDirectoryLabel().setText(location + "/" + name);
@@ -222,7 +226,7 @@ public class GUIController {
     if (scenarioFile.exists()) {
       scenarioFile.delete(); // Delete the existing file to allow overwriting
     }
-    try (java.io.FileWriter writer = new java.io.FileWriter(scenarioFile)) {
+    try (FileWriter writer = new FileWriter(scenarioFile)) {
       for (Map.Entry<ImageIcon, Integer> entry : timeLinePanelController.getImageCopiesWithDurations()) {
         ImageIcon image = entry.getKey();
         String imageName = image.getDescription();
@@ -259,9 +263,11 @@ public class GUIController {
       });
     }
 
-    JMenuItem exitItem = mainFrame.getMenuItem(0, 3);
+    JMenuItem exitItem = mainFrame.getMenuItem(0, 4);
     if (exitItem != null) {
-      exitItem.addActionListener(e -> System.exit(0));
+      exitItem.addActionListener(e -> {
+        System.exit(0); // Exit the application
+      });
     }
 
     JMenuItem undoItem = mainFrame.getMenuItem(1, 0);

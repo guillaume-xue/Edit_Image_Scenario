@@ -48,13 +48,13 @@ public class DividerPanel extends JPanel {
         public void mouseDragged(MouseEvent e) {
           int dx = e.getXOnScreen() - startX;
           // Calcul de la nouvelle durée en fonction du zoom
-          int newLeftDuration = Math.max(1, (int)Math.round(startLeftDuration + (dx / zoomFactor)));
+          int newLeftDuration = Math.max(1, (int) Math.round(startLeftDuration + (dx / zoomFactor)));
           int newRightDuration = startRightDuration > 0
-            ? Math.max(1, (int)Math.round(startRightDuration - (dx / zoomFactor)))
-            : 0;
+              ? Math.max(1, (int) Math.round(startRightDuration - (dx / zoomFactor)))
+              : 0;
 
-          // Largeur minimale de 40px
-          int minDuration = (int)Math.ceil(40.0 / zoomFactor);
+          // Largeur minimale de 1px
+          int minDuration = (int) Math.ceil(1.0 / zoomFactor);
           newLeftDuration = Math.max(newLeftDuration, minDuration);
           if (newRightDuration > 0) {
             newRightDuration = Math.max(newRightDuration, minDuration);
@@ -73,8 +73,8 @@ public class DividerPanel extends JPanel {
           right.repaint();
 
           // Ajout : mettre à jour la marge de fin si possible
-          if (left instanceof com.upc.view.ResizablePanel) {
-            com.upc.view.TimeLinePanel parentPanel = left.getParentTimeLinePanel();
+          if (left instanceof ResizablePanel) {
+            TimeLinePanel parentPanel = left.getParentTimeLinePanel();
             if (parentPanel != null) {
               parentPanel.updateEndMarginPanel();
             }

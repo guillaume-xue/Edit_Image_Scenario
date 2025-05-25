@@ -87,7 +87,6 @@ public class AnimaViewPanelController {
   private void animatePanel() {
     SwingUtilities.invokeLater(() -> ended = false);
 
-    // ...existing code...
     animationThread = new Thread(() -> {
       elapsed = 0;
       pauseAccum = 0;

@@ -1,6 +1,5 @@
 package com.upc.view;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.BorderLayout;
@@ -8,6 +7,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
+import static javax.imageio.ImageIO.read;
+import static java.awt.Image.SCALE_SMOOTH;
 
 public class AnimeViewPanel extends JPanel {
 
@@ -58,11 +59,11 @@ public class AnimeViewPanel extends JPanel {
     Image advanceImg = null;
     Image loopImg = null;
     try {
-      startImg = ImageIO.read(startIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
-      breakImg = ImageIO.read(breakIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
-      backImg = ImageIO.read(backIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
-      advanceImg = ImageIO.read(advanceIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
-      loopImg = ImageIO.read(loopIcon).getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
+      startImg = read(startIcon).getScaledInstance(16, 16, SCALE_SMOOTH);
+      breakImg = read(breakIcon).getScaledInstance(16, 16, SCALE_SMOOTH);
+      backImg = read(backIcon).getScaledInstance(16, 16, SCALE_SMOOTH);
+      advanceImg = read(advanceIcon).getScaledInstance(16, 16, SCALE_SMOOTH);
+      loopImg = read(loopIcon).getScaledInstance(16, 16, SCALE_SMOOTH);
     } catch (Exception e) {
       e.printStackTrace();
     }

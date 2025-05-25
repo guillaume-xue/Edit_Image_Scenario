@@ -1,7 +1,5 @@
 package com.upc.view;
 
-import com.upc.controller.DrawingController;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -13,7 +11,6 @@ public class DrawingPanel extends JPanel {
     private Color previewColor;
     private boolean isPreviewing = false;
     private String previewShape = ""; // "Cercle" ou "Carré"
-    private Dimension dim;
 
     public DrawingPanel() {
         super();
@@ -26,7 +23,6 @@ public class DrawingPanel extends JPanel {
         gi.drawLine(ox, oy, x, y);
         repaint();
     }
-
 
     @Override
     public void paintComponent(Graphics g) {
@@ -100,7 +96,8 @@ public class DrawingPanel extends JPanel {
     }
 
     public boolean isEmpty() {
-        if (bi == null) return true;
+        if (bi == null)
+            return true;
         int w = bi.getWidth();
         int h = bi.getHeight();
         int[] pixels = new int[w * h];
@@ -114,7 +111,8 @@ public class DrawingPanel extends JPanel {
     }
 
     public void clearAll() {
-        if (bi == null) return;
+        if (bi == null)
+            return;
         gi.setColor(Color.WHITE);
         gi.fillRect(0, 0, bi.getWidth(), bi.getHeight());
         repaint();
@@ -131,16 +129,17 @@ public class DrawingPanel extends JPanel {
     }
 
     private void resizeCanvas(int newWidth, int newHeight) {
-        if (newWidth <= 0 || newHeight <= 0) return;
+        if (newWidth <= 0 || newHeight <= 0)
+            return;
 
         if (bi == null) {
             // Première initialisation
-            dim = new Dimension(newWidth, newHeight);
             initializeCanvas();
             return;
         }
 
-        if (bi.getWidth() == newWidth && bi.getHeight() == newHeight) return;
+        if (bi.getWidth() == newWidth && bi.getHeight() == newHeight)
+            return;
 
         BufferedImage newBi = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = newBi.createGraphics();
@@ -155,7 +154,6 @@ public class DrawingPanel extends JPanel {
 
         bi = newBi;
         gi = (Graphics2D) bi.getGraphics();
-        dim = new Dimension(newWidth, newHeight);
         repaint();
     }
 
@@ -173,7 +171,6 @@ public class DrawingPanel extends JPanel {
             gi.setColor(getBackground());
             gi.fillRect(0, 0, w, h);
             gi.setStroke(new BasicStroke(1));
-            dim = new Dimension(w, h);
         }
     }
 
@@ -186,5 +183,5 @@ public class DrawingPanel extends JPanel {
             parent = parent.getParent();
         }
         return null; // Si aucun parent n'est trouvé
-    } 
+    }
 }
