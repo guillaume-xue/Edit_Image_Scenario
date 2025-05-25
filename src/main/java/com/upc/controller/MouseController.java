@@ -8,18 +8,23 @@ import com.upc.view.ResizablePanel;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 public class MouseController {
 
-  public class TimeLinePanelMouseController extends MouseAdapter {
+  public class TimeLinePanelMouseController extends MouseAdapter implements MouseMotionListener {
 
     ResizablePanel resizablePanel;
     TimeLinePanelController timeLinePanelController;
+    private int dragStartScreenX = -1;
+    private int originalDuration = -1;
+    private boolean resizing = false;
 
     public TimeLinePanelMouseController(ResizablePanel resizablePanel,
         TimeLinePanelController timeLinePanelController) {
       this.resizablePanel = resizablePanel;
       this.timeLinePanelController = timeLinePanelController;
+      resizablePanel.addMouseMotionListener(this);
     }
 
     @Override
@@ -34,6 +39,56 @@ public class MouseController {
         menu.show(resizablePanel, e.getX(), e.getY());
       }
     }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+      if (e.getButton() == MouseEvent.BUTTON1) {
+        int x = e.getX();
+        int width = resizablePanel.getWidth();
+        // Toujours synchroniser le zoom avec le TimeLinePanel
+        double currentZoom = timeLinePanelController.getTimeLinePanel().getZoomFactor();
+        resizablePanel.setZoomFactor(currentZoom);
+        if (x >= width - 10 && x <= width) {
+          resizing = true;
+          dragStartScreenX = e.getLocationOnScreen().x;
+          originalDuration = resizablePanel.getDuration();
+        } else {
+          resizing = false;
+        }
+      }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+      if (resizing && dragStartScreenX >= 0 && originalDuration >= 0) {
+        int currentScreenX = e.getLocationOnScreen().x;
+        int delta = currentScreenX - dragStartScreenX;
+        double zoom = resizablePanel.getZoomFactor();
+        // Calcul en double pour éviter les erreurs d'arrondi
+        double newDurationD = originalDuration + (delta / zoom);
+        int newDuration = Math.max(1, (int) Math.round(newDurationD));
+        // Largeur minimale de 40px
+        int minDuration = (int) Math.ceil(40.0 / zoom);
+        newDuration = Math.max(newDuration, minDuration);
+        resizablePanel.setDuration(newDuration);
+        java.awt.Container parent = resizablePanel.getParent();
+        if (parent != null) {
+          parent.revalidate();
+          parent.repaint();
+        }
+      }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+      dragStartScreenX = -1;
+      originalDuration = -1;
+      resizing = false;
+    }
+
+    // Nécessaire pour MouseMotionListener, mais non utilisé ici
+    @Override
+    public void mouseMoved(MouseEvent e) {}
   }
 
   public class ButtonEffect extends MouseAdapter {

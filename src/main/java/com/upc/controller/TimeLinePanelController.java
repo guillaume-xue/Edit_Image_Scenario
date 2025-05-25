@@ -3,6 +3,7 @@ package com.upc.controller;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ public class TimeLinePanelController {
     this.mouseController = mouseController;
     this.loadingDialog = loadingDialog;
     this.timeLinePanel.setTransferHandler(transferController.new TransferTimeLine(this));
+    this.timeLinePanel.setController(this); // Connecte le contrôleur à la vue pour les boutons
   }
 
   public void initTimeLinePanel(File scenario, File imageDirectory) {
@@ -99,26 +101,48 @@ public class TimeLinePanelController {
     }.execute();
   }
 
+  public void zoomIn() {
+    double current = timeLinePanel.getZoomFactor();
+    if (current < 5.0) { // Limite max de zoom
+      timeLinePanel.setZoomFactor(current * 1.25);
+      syncScroll();
+    }
+  }
+
+  public void zoomOut() {
+    double current = timeLinePanel.getZoomFactor();
+    if (current > 0.2) { // Limite min de zoom
+      timeLinePanel.setZoomFactor(current / 1.25);
+      syncScroll();
+    }
+  }
+
+  private void syncScroll() {
+    javax.swing.JScrollBar hBar = timeLinePanel.getScrollPane().getHorizontalScrollBar();
+    int value = hBar.getValue();
+    hBar.setValue(value); // Force la synchro de la position
+  }
+
   public void addImageLabel(ImageIcon imageIcon, int duration) {
-    ResizablePanel resizablePanel = new ResizablePanel(imageIcon, duration);
-    int width = duration;
-    int height = 100;
-    resizablePanel.setPreferredSize(new Dimension(width, height));
-    resizablePanel.setMinimumSize(new Dimension(width, height));
-    resizablePanel.setMaximumSize(new Dimension(width, height));
+    com.upc.view.ResizablePanel resizablePanel = new com.upc.view.ResizablePanel(imageIcon, duration);
+    double zoom = timeLinePanel.getZoomFactor();
+    resizablePanel.updateWidthFromDuration(zoom);
+    resizablePanel.setParentTimeLinePanel(timeLinePanel); // Ajouté
     resizablePanel.addMouseListener(mouseController.new TimeLinePanelMouseController(resizablePanel, this));
-    ResizablePanel emptyPanel = new ResizablePanel();
+    com.upc.view.ResizablePanel emptyPanel = new com.upc.view.ResizablePanel();
     timeLinePanel.getTimeLinePanel().add(resizablePanel);
     if (currentDividerPanel != null) {
       timeLinePanel.getTimeLinePanel().remove(timeLinePanel.getTimeLinePanel().getComponentCount() - 2);
-      currentDividerPanel = new DividerPanel(currentDividerPanel, resizablePanel, emptyPanel);
+      currentDividerPanel = new com.upc.view.DividerPanel(currentDividerPanel, resizablePanel, emptyPanel);
     } else {
-      currentDividerPanel = new DividerPanel(null, resizablePanel, emptyPanel);
+      currentDividerPanel = new com.upc.view.DividerPanel(null, resizablePanel, emptyPanel);
     }
+
     timeLinePanel.getTimeLinePanel().add(currentDividerPanel);
     timeLinePanel.getTimeLinePanel().add(emptyPanel);
     timeLinePanel.getTimeLinePanel().revalidate(); // Refresh layout
     timeLinePanel.getTimeLinePanel().repaint(); // Repaint the panel
+    timeLinePanel.updateEndMarginPanel();
   }
 
   public void removeImageLabel(ResizablePanel resizablePanel) {
@@ -128,6 +152,7 @@ public class TimeLinePanelController {
     }
     timeLinePanel.getTimeLinePanel().revalidate();
     timeLinePanel.getTimeLinePanel().repaint();
+    timeLinePanel.updateEndMarginPanel();
   }
 
   private DividerPanel removeImageLabelRecursive(DividerPanel divider, ResizablePanel resizablePanel) {
@@ -165,4 +190,7 @@ public class TimeLinePanelController {
     return imageCopiesWithDurations;
   }
 
+  public TimeLinePanel getTimeLinePanel() {
+    return timeLinePanel;
+  }
 }

@@ -14,7 +14,9 @@ public class DividerPanel extends JPanel {
   private ResizablePanel left;
   private ResizablePanel right;
   private DividerPanel precDividerPanel;
-  private int startX, startLeftWidth, startRightWidth;
+  private int startX;
+  private int startLeftDuration, startRightDuration;
+  private double zoomFactor;
 
   public DividerPanel(DividerPanel prec, ResizablePanel left, ResizablePanel right) {
     if (prec != null) {
@@ -32,28 +34,48 @@ public class DividerPanel extends JPanel {
     addMouseListener(new MouseAdapter() {
       public void mousePressed(MouseEvent e) {
         startX = e.getXOnScreen();
-        startLeftWidth = left.getWidth();
-        startRightWidth = right.getWidth();
+        // On récupère la durée et le zoom courant
+        startLeftDuration = left.getDuration();
+        startRightDuration = right.getDuration();
+        zoomFactor = left.getZoomFactor();
       }
     });
 
     addMouseMotionListener(new MouseMotionAdapter() {
       public void mouseDragged(MouseEvent e) {
         int dx = e.getXOnScreen() - startX;
-        int newLeft = Math.max(50, startLeftWidth + dx);
-        int newRight = Math.max(50, startRightWidth - dx);
-        left.setPreferredSize(new Dimension(newLeft, left.getHeight()));
-        left.setDuration(newLeft + "");
-        right.setPreferredSize(new Dimension(newRight, right.getHeight()));
-        if (right.getDuration() != 0) {
-          right.setDuration(newRight + "");
+        // Calcul de la nouvelle durée en fonction du zoom
+        int newLeftDuration = Math.max(1, (int)Math.round(startLeftDuration + (dx / zoomFactor)));
+        int newRightDuration = startRightDuration > 0
+          ? Math.max(1, (int)Math.round(startRightDuration - (dx / zoomFactor)))
+          : 0;
+
+        // Largeur minimale de 40px
+        int minDuration = (int)Math.ceil(40.0 / zoomFactor);
+        newLeftDuration = Math.max(newLeftDuration, minDuration);
+        if (newRightDuration > 0) {
+          newRightDuration = Math.max(newRightDuration, minDuration);
         }
+
+        left.setDuration(newLeftDuration);
+        if (right.getDuration() != 0) {
+          right.setDuration(newRightDuration);
+        }
+
         left.revalidate();
         right.revalidate();
         DividerPanel.this.getParent().revalidate();
         DividerPanel.this.getParent().repaint();
         left.repaint();
         right.repaint();
+
+        // Ajout : mettre à jour la marge de fin si possible
+        if (left instanceof com.upc.view.ResizablePanel) {
+          com.upc.view.TimeLinePanel parentPanel = left.getParentTimeLinePanel();
+          if (parentPanel != null) {
+            parentPanel.updateEndMarginPanel();
+          }
+        }
       }
     });
   }
