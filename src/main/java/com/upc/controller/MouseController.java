@@ -2,22 +2,33 @@ package com.upc.controller;
 
 import javax.swing.*;
 
+import com.upc.view.AnimeViewPanel;
 import com.upc.view.ImageViewPanel;
+import com.upc.view.MainFrame;
 import com.upc.view.ResizablePanel;
+import javax.swing.SwingUtilities;
 
-import java.awt.Color;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 /**
- * Contrôleur pour la gestion des interactions souris sur différents composants de l'application.
+ * Contrôleur pour la gestion des interactions souris sur différents composants
+ * de l'application.
  * Gère le redimensionnement, les effets de survol et les menus contextuels.
  */
 public class MouseController {
 
   /**
-   * Contrôleur pour la gestion de la souris sur les panneaux redimensionnables de la timeline.
-   * Permet le redimensionnement, la suppression, la modification de durée et le déplacement.
+   * Contrôleur pour la gestion de la souris sur les panneaux redimensionnables de
+   * la timeline.
+   * Permet le redimensionnement, la suppression, la modification de durée et le
+   * déplacement.
    */
   public class TimeLinePanelMouseController extends MouseAdapter {
 
@@ -49,14 +60,16 @@ public class MouseController {
         JMenuItem setTime = new JMenuItem("Temps");
         setTime.addActionListener(event -> {
           // Ouvre un JDialog pour saisir la durée en ms
-          String input = JOptionPane.showInputDialog(resizablePanel, "Entrer la durée (ms) :", resizablePanel.getDuration());
+          String input = JOptionPane.showInputDialog(resizablePanel, "Entrer la durée (ms) :",
+              resizablePanel.getDuration());
           if (input != null) {
             try {
               int newDuration = Integer.parseInt(input.trim());
               if (newDuration > 0) {
                 resizablePanel.setDuration(newDuration);
               } else {
-                JOptionPane.showMessageDialog(resizablePanel, "La durée doit être positive.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(resizablePanel, "La durée doit être positive.", "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
               }
             } catch (NumberFormatException ex) {
               JOptionPane.showMessageDialog(resizablePanel, "Entrée invalide.", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -149,8 +162,73 @@ public class MouseController {
     }
   }
 
+  public class TabbedPaneMainMouseController extends MouseAdapter {
+
+    private MainFrame mainFrame;
+    private JTabbedPane tabbedPane;
+    private AnimeViewPanel animeViewPanel;
+    private boolean isDragging = false;
+
+    public TabbedPaneMainMouseController(MainFrame mainFrame) {
+      this.mainFrame = mainFrame;
+      this.tabbedPane = mainFrame.getTabbedPane();
+      this.animeViewPanel = mainFrame.getAnimeViewPanel();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+      int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
+      if (tabIndex == 1 && e.getClickCount() == 2) { // Double-clic sur "Animation"
+        try {
+          SwingUtilities.invokeLater(() -> { // Différer la suppression de l'onglet
+            tabbedPane.removeTabAt(tabIndex);
+            JFrame animationFrame = new JFrame("Animation");
+            animationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            animationFrame.add(animeViewPanel);
+            animationFrame.setSize(600, 400);
+            animationFrame.setLocationRelativeTo(null);
+            animationFrame.setVisible(true);
+
+            // Réattacher si la fenêtre Animation est fermée
+            animationFrame.addWindowListener(new WindowAdapter() {
+              @Override
+              public void windowClosed(WindowEvent e) {
+                tabbedPane.addTab("Animation", animeViewPanel);
+              }
+            });
+
+            // Réattacher si la fenêtre Animation est déplacée près de la fenêtre principale
+            animationFrame.addComponentListener(new ComponentAdapter() {
+              @Override
+              public void componentMoved(ComponentEvent e) {
+                isDragging = true; // L'utilisateur est en train de glisser
+              }
+            });
+
+            animationFrame.addMouseListener(new MouseAdapter() {
+              @Override
+              public void mouseReleased(MouseEvent e) {
+                isDragging = false; // L'utilisateur a relâché le clic
+                Point mainLoc = mainFrame.getLocationOnScreen();
+                Point animLoc = animationFrame.getLocationOnScreen();
+                double distance = mainLoc.distance(animLoc);
+                if (distance < 100) { // Seuil de proximité en pixels
+                  animationFrame.dispose(); // Ferme la fenêtre Animation
+                  tabbedPane.addTab("Animation", animeViewPanel); // Réinsère l'onglet
+                }
+              }
+            });
+          });
+        } catch (Exception ex) {
+          System.out.println("Erreur lors de la suppression de l'onglet.");
+        }
+      }
+    }
+  }
+
   /**
-   * Effet de survol pour les boutons (changement de couleur au passage de la souris).
+   * Effet de survol pour les boutons (changement de couleur au passage de la
+   * souris).
    */
   public class ButtonEffect extends MouseAdapter {
 

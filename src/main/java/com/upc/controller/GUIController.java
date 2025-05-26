@@ -26,7 +26,8 @@ import com.upc.view.ViewPanel;
 
 /**
  * Contrôleur principal de l'application graphique.
- * Gère l'initialisation des vues, la navigation entre projets, la sauvegarde et le chargement,
+ * Gère l'initialisation des vues, la navigation entre projets, la sauvegarde et
+ * le chargement,
  * ainsi que la coordination entre les différents contrôleurs de l'application.
  */
 public class GUIController {
@@ -109,6 +110,7 @@ public class GUIController {
       TimeLinePanel timeLinePanel = new TimeLinePanel();
       AnimeViewPanel animeViewPanel = new AnimeViewPanel();
       this.mainFrame = new MainFrame(imageEditor.getImageEditPanel(), viewPanel, timeLinePanel, animeViewPanel);
+      this.mainFrame.getTabbedPane().addMouseListener(mouseController.new TabbedPaneMainMouseController(mainFrame));
       this.viewPanelController = new ViewPanelController(viewPanel, mainFrame, transferController, mouseController,
           imageDir.getAbsolutePath(), loadingDialog);
       this.timeLinePanelController = new TimeLinePanelController(timeLinePanel, transferController,
@@ -118,6 +120,7 @@ public class GUIController {
       this.animaViewPanelController = new AnimaViewPanelController(animeViewPanel, this.timeLinePanelController,
           imageDir);
       animaViewPanelController.initialize();
+
       initMenuBarController();
     } catch (IOException ex) {
       ex.printStackTrace();
@@ -158,6 +161,7 @@ public class GUIController {
   /**
    * Ouvre un dossier projet existant ou en crée un nouveau selon le paramètre.
    * Vérifie la validité de la structure du dossier.
+   * 
    * @param isNewProject true si ouverture dans le cadre d'un nouveau projet
    */
   private void openFolder(boolean isNewProject) {
@@ -197,7 +201,8 @@ public class GUIController {
   }
 
   /**
-   * Initialise les écouteurs pour la fenêtre d'options (nouveau projet, ouvrir projet).
+   * Initialise les écouteurs pour la fenêtre d'options (nouveau projet, ouvrir
+   * projet).
    */
   private void initOptionFrameListener() {
     optionFrame.getNewProjet().addActionListener(e -> {
@@ -339,6 +344,7 @@ public class GUIController {
 
   /**
    * Met à jour le panneau de visualisation avec une nouvelle image.
+   * 
    * @param imagePath chemin de l'image
    * @param imageName nom de l'image
    */

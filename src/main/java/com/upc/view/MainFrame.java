@@ -6,29 +6,26 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Point;
 
 /**
  * Fenêtre principale de l'application.
- * Gère la disposition générale, les menus, les onglets et l'intégration des différents panneaux.
+ * Gère la disposition générale, les menus, les onglets et l'intégration des
+ * différents panneaux.
  */
 public class MainFrame extends JFrame {
 
+  private JTabbedPane tabbedPane;
+  private AnimeViewPanel animeViewPanel;
+
   /**
    * Constructeur de la fenêtre principale.
+   * 
    * @param imageEditPanel panneau d'édition d'image
-   * @param viewPanel panneau de visualisation des images
-   * @param timeLinePanel panneau de timeline pour l'animation
+   * @param viewPanel      panneau de visualisation des images
+   * @param timeLinePanel  panneau de timeline pour l'animation
    * @param animeViewPanel panneau de visualisation de l'animation
    */
   public MainFrame(ImageEditorView imageEditPanel, ViewPanel viewPanel, TimeLinePanel timeLinePanel,
@@ -38,74 +35,23 @@ public class MainFrame extends JFrame {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
 
     createMenuBar();
+    this.animeViewPanel = animeViewPanel;
     JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     splitPane.setDividerLocation(400);
     splitPane.setEnabled(true);
     splitPane.setDividerSize(8);
     splitPane.setResizeWeight(0.5);
 
-    // Définir une taille minimale très faible pour permettre le redimensionnement libre
-    JTabbedPane tabbedPane = new JTabbedPane();
+    // Définir une taille minimale très faible pour permettre le redimensionnement
+    // libre
+    tabbedPane = new JTabbedPane();
     tabbedPane.setTabPlacement(JTabbedPane.LEFT);
     tabbedPane.addTab("Draw", imageEditPanel);
-    tabbedPane.addTab("Animation", animeViewPanel);
-    tabbedPane.setMinimumSize(new Dimension(10, 10));
+    tabbedPane.addTab("Animation", this.animeViewPanel);
+    tabbedPane.setMinimumSize(new Dimension(400, 400));
     imageEditPanel.setMinimumSize(new Dimension(10, 10));
-    animeViewPanel.setMinimumSize(new Dimension(10, 10));
+    this.animeViewPanel.setMinimumSize(new Dimension(10, 10));
     viewPanel.setMinimumSize(new Dimension(10, 10));
-
-    // Gestion du détachement de l'onglet Animation par double-clic
-    tabbedPane.addMouseListener(new MouseAdapter() {
-      private boolean isDragging = false;
-
-      @Override
-      public void mousePressed(MouseEvent e) {
-        int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
-        if (tabIndex == 1 && e.getClickCount() == 2) { // Double-clic sur "Animation"
-          SwingUtilities.invokeLater(() -> { // Différer la suppression de l'onglet
-            tabbedPane.removeTabAt(tabIndex);
-            JFrame animationFrame = new JFrame("Animation");
-            animationFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            animationFrame.add(animeViewPanel);
-            animationFrame.setSize(600, 400);
-            animationFrame.setLocationRelativeTo(null);
-            animationFrame.setVisible(true);
-
-            // Réattacher si la fenêtre Animation est fermée
-            animationFrame.addWindowListener(new WindowAdapter() {
-              @Override
-              public void windowClosed(WindowEvent e) {
-                if (!isDragging) { // Ne réinsère que si l'utilisateur n'est pas en train de glisser
-                  tabbedPane.addTab("Animation", animeViewPanel);
-                }
-              }
-            });
-
-            // Réattacher si la fenêtre Animation est déplacée près de la fenêtre principale
-            animationFrame.addComponentListener(new ComponentAdapter() {
-              @Override
-              public void componentMoved(ComponentEvent e) {
-                isDragging = true; // L'utilisateur est en train de glisser
-              }
-            });
-
-            animationFrame.addMouseListener(new MouseAdapter() {
-              @Override
-              public void mouseReleased(MouseEvent e) {
-                isDragging = false; // L'utilisateur a relâché le clic
-                Point mainLoc = MainFrame.this.getLocationOnScreen();
-                Point animLoc = animationFrame.getLocationOnScreen();
-                double distance = mainLoc.distance(animLoc);
-                if (distance < 100) { // Seuil de proximité en pixels
-                  animationFrame.dispose(); // Ferme la fenêtre Animation
-                  tabbedPane.addTab("Animation", animeViewPanel); // Réinsère l'onglet
-                }
-              }
-            });
-          });
-        }
-      }
-    });
 
     splitPane.setLeftComponent(tabbedPane);
     splitPane.setRightComponent(viewPanel);
@@ -131,6 +77,8 @@ public class MainFrame extends JFrame {
   private void init() {
     this.setSize(1280, 720);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    this.setPreferredSize(new Dimension(1280, 720));
+    this.setMinimumSize(new Dimension(800, 600));
     this.setTitle("Image Editor");
     this.setLocationRelativeTo(null);
     this.setVisible(true);
@@ -173,6 +121,7 @@ public class MainFrame extends JFrame {
 
   /**
    * Permet de récupérer un JMenuItem à partir de son index de menu et d'item.
+   * 
    * @param menuIndex index du menu dans la barre de menus
    * @param itemIndex index de l'item dans le menu
    * @return JMenuItem correspondant ou null si non trouvé
@@ -191,6 +140,24 @@ public class MainFrame extends JFrame {
     }
 
     return menu.getItem(itemIndex);
+  }
+
+  /**
+   * Permet de récupérer le JTabbedPane principal.
+   * 
+   * @return le JTabbedPane principal
+   */
+  public JTabbedPane getTabbedPane() {
+    return tabbedPane;
+  }
+
+  /**
+   * Permet de récupérer le panneau de visualisation de l'animation.
+   * 
+   * @return le panneau de visualisation de l'animation
+   */
+  public AnimeViewPanel getAnimeViewPanel() {
+    return animeViewPanel;
   }
 
 }
